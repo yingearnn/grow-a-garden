@@ -4,7 +4,9 @@ const router = express.Router();
 const userRoutes = require('./userRoutes');
 const challengesRoutes = require('./challengesRoutes');
 const plantsRoutes = require('./plantsRoutes');
-
+const jwtMiddleware = require('../middlewares/jwtMiddleware');
+const bcryptMiddleware = require('../middlewares/bcryptMiddleware');
+const userController = require('../controllers/userController');
 
 
 
@@ -12,5 +14,14 @@ const plantsRoutes = require('./plantsRoutes');
 router.use("/user" , userRoutes )
 router.use("/challenges" , challengesRoutes )
 router.use("/plants" , plantsRoutes )
+
+router.post("/login", userController.login, bcryptMiddleware.comparePassword, jwtMiddleware.generateToken, jwtMiddleware.sendToken);
+router.post(
+  "/register",
+  bcryptMiddleware.hashPassword,
+  userController.createNewUser,
+  jwtMiddleware.generateToken,
+  jwtMiddleware.sendToken
+);
 
 module.exports = router;

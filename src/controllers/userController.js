@@ -44,47 +44,45 @@ module.exports.readUserById = (req, res, next) =>
 }
 
 // Create a new user
-module.exports.createNewUser = (req, res, next) =>
+module.exports.createNewUser = (req, res, next) => {
 
-{ 
-       if(!req.body || !req.body.username)
-    {
-        res.status(400).json({message : "Username is missing"});
-        return;
+    // 1. Validate input
+    if (!req.body || !req.body.username || !req.body.password) {
+        return res.status(400).json({
+            message: "Username or password is missing"
+        });
     }
 
+    // 2. Prepare data (password already hashed)
     const data = {
         username: req.body.username,
-    }
+        password: res.locals.hash
+    };
 
-                                                    
- 
-    const callback = (error, results, fields) => {
+    // 3. Insert user
+    const callback = (error, results) => {
         if (error) {
 
-               if (error.code === "ER_DUP_ENTRY") {
+            if (error.code === "ER_DUP_ENTRY") {
                 return res.status(409).json({
                     message: "Username is already taken"
                 });
             }
 
-            
             console.error("Error createNewUser:", error);
-           return res.status(500).json(error);
-        } 
-        
-        else {
-           return res.status(201).json({
-                user_id: results.insertId,
-                username: data.username,
-                points: 0
-
-            });
+            return res.status(500).json(error);
         }
-    }
+
+        // 4. Pass userId to JWT middleware
+        res.locals.userId = results.insertId;
+        next();
+    };
 
     userModel.insertSingle(data, callback);
-}
+};
+
+
+
 // Update user info
 module.exports.updateUserById = (req, res, next) =>
 {
@@ -161,3 +159,45 @@ module.exports.validateUser = (req, res, next) =>
 
     userModel.selectById(data, callback);
 }
+
+module.exports.login = (req, res, next) => {
+    try { 
+        const requiredFields = ['username', 'password'];
+
+        for (const field of requiredFields) {
+            if (req.body[field] === undefined || req.body[field] === "") {
+                res.status(400).json({ message: `${field} is undefined or empty` });
+                return;
+            }
+        };
+
+        const data = {
+            username: req.body.username,
+            password: res.locals.hash
+        };
+
+        const callback = (error, results) => {
+            if(error){
+                console.error("Error login callback: ", error);
+                res.status(500).json(error);
+            } else {
+                if(results.length == 0){
+                    res.status(404).json({message: "User not found"}); 
+                } else {
+                    res.locals.userId = results[0].id
+                    res.locals.hash = results[0].password
+                    next();
+                }
+            }
+        };
+
+        userModel.login(data, callback);
+
+    } catch (error) {
+        console.error("Error login: ", error);
+        res.status(500).json(error);
+    }
+};
+
+
+
