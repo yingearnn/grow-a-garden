@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Garden Game – Home</title>
+  <link rel="stylesheet" href="css/garden.css">
+</head>
+<body>
+  <!-- Top bar -->
+  <header class="top-bar">
+    <div class="stats">
+      <span id="points">Points: 0</span>
+      <span id="networth">Net Worth: 0</span>
+    </div>
+    <div class="actions">
+      <button id="shop-btn">Shop</button>
+      <button id="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <!-- Main garden layout -->
+  <main class="garden-main">
+    <!-- Garden plot -->
+    <section class="garden-plot">
+      <h2>🌱 My Garden</h2>
+      <div id="plot-container" class="plot-grid">
+        <!-- Grid cells will be generated dynamically -->
+         
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+    <div class="plot-cell"></div>
+  </div>
+     
+
+    </section>
+
+    <!-- Inventory -->
+    <aside class="inventory">
+      <h3>Inventory</h3>
+      <div id="inventory-list"></div>
+    </aside>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/currentUrl.js"></script>
+  <script src="js/fetchMethod.js"></script>
+  <script src="js/garden.js"></script>
+</body>
+</html>

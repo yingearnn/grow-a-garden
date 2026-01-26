@@ -47,15 +47,16 @@ module.exports.readUserById = (req, res, next) =>
 module.exports.createNewUser = (req, res, next) => {
 
     // 1. Validate input
-    if (!req.body || !req.body.username || !req.body.password) {
+    if (!req.body || !req.body.username || !req.body.password ||!req.body.email) {
         return res.status(400).json({
-            message: "Username or password is missing"
+            message: "Username,password or email is missing"
         });
     }
 
     // 2. Prepare data (password already hashed)
     const data = {
         username: req.body.username,
+        email:req.body.email,
         password: res.locals.hash
     };
 
@@ -65,7 +66,7 @@ module.exports.createNewUser = (req, res, next) => {
 
             if (error.code === "ER_DUP_ENTRY") {
                 return res.status(409).json({
-                    message: "Username is already taken"
+                    message: "Username or email is already taken"
                 });
             }
 
@@ -74,7 +75,8 @@ module.exports.createNewUser = (req, res, next) => {
         }
 
         // 4. Pass userId to JWT middleware
-        res.locals.userId = results.insertId;
+        res.locals.user_id =results.insertId;
+        res.locals.message = "Registration successful";
         next();
     };
 

@@ -22,12 +22,13 @@ pool.query(SQLSTATEMENT, VALUES, callback);
 // Insert a new user
 module.exports.insertSingle = (data, callback) => {
     const SQLSTATEMENT = `
-        INSERT INTO User (username, password)
-        VALUES (?, ?);
+        INSERT INTO User (username, email, password)
+        VALUES (?, ?, ?);
     `;
 
     const VALUES = [
         data.username,
+        data.email,
         data.password
     ];
 

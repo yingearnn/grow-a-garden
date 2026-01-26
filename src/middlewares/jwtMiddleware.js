@@ -21,7 +21,7 @@ const tokenAlgorithm = process.env.JWT_ALGORITHM;
 //////////////////////////////////////////////////////
 module.exports.generateToken = (req, res, next) => {
   const payload = {
-    userId: res.locals.userId,
+    userId: res.locals.user_id,
     timestamp: new Date()
   };
 
@@ -50,6 +50,7 @@ module.exports.sendToken = (req, res, next) => {
   res.status(200).json({
     message: res.locals.message,
     token: res.locals.token,
+    userId:  res.locals.user_id
   });
 };
 

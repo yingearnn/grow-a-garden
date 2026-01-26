@@ -1,12 +1,20 @@
 const pool = require("../services/db");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
-const SQLSTATEMENT = `
+// Hash the initial password for default users
+bcrypt.hash('1234', saltRounds, (err, hash) => {
+  if (err) {
+    console.error("Error hashing initial password:", err);
+    process.exit(1);
+  }
+
+  const SQLSTATEMENT = `
 DROP TABLE IF EXISTS UserPlants;
 DROP TABLE IF EXISTS UserCompletion;
 DROP TABLE IF EXISTS WellnessChallenge;
 DROP TABLE IF EXISTS User;
 DROP TABLE IF EXISTS Plants;
-
 
 CREATE TABLE Plants (
     plant_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -27,19 +35,20 @@ INSERT INTO Plants (plant_id, name, rarity, points, value) VALUES
 (8, 'Venus Flytrap', 'special', 60, 1000),
 (9, 'Cherry Blossom', 'legendary', 120, 3000);
 
-
 CREATE TABLE User (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
+    email TEXT NOT NULL,
+    password TEXT NOT NULL,
     username VARCHAR(255) NOT NULL UNIQUE,
-    points INT DEFAULT 0 ,
+    points INT DEFAULT 0,
     net_worth INT DEFAULT 0
 );
 
-INSERT INTO User (user_id, username) VALUES
-(1, 'happyPlant'),
-(2, 'the_sunflowerguy'),
-(3, 'plantMakesMEEhappy');
-
+-- Insert initial users with hashed password
+INSERT INTO User (user_id, username, email, password) VALUES
+(1, 'happyPlant', 'happyplant@gmail.com', '${hash}'),
+(2, 'the_sunflowerguy', 'sunny@gmail.com', '${hash}'),
+(3, 'plantMakesMEEhappy', 'MEe@gmail.com', '${hash}');
 
 CREATE TABLE UserPlants (
     user_plant_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -52,13 +61,8 @@ INSERT INTO UserPlants (user_id, plant_id) VALUES
 (1, 1),
 (2, 1);
 
-UPDATE User
-SET net_worth = 100
-WHERE user_id = 1;
-
-UPDATE User
-SET net_worth = 100
-WHERE user_id = 2;
+UPDATE User SET net_worth = 100 WHERE user_id = 1;
+UPDATE User SET net_worth = 100 WHERE user_id = 2;
 
 CREATE TABLE WellnessChallenge (
     challenge_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -77,7 +81,6 @@ INSERT INTO WellnessChallenge (challenge_id, creator_id, description, points) VA
 (6, 3, 'Declutter your chaos - Clean your desk or room', 20),
 (7, 3, 'Help a homie - Assist someone without being asked', 20);
 
-
 CREATE TABLE UserCompletion (
     completion_id INT AUTO_INCREMENT PRIMARY KEY,
     challenge_id INT NOT NULL,
@@ -92,11 +95,12 @@ INSERT INTO UserCompletion (completion_id, challenge_id, user_id, details) VALUE
 (2, 1, 2, 'completed sleep like a boss');
 `;
 
-pool.query(SQLSTATEMENT, (error, results, fields) => {
-  if (error) {
-    console.error("Error creating tables:", error);
-  } else {
-    console.log("Tables created successfully");
-  }
-  process.exit();
+  pool.query(SQLSTATEMENT, (error, results) => {
+    if (error) {
+      console.error("Error creating tables:", error);
+    } else {
+      console.log("Tables and initial users created successfully!");
+    }
+    process.exit();
+  });
 });

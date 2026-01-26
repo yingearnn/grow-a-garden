@@ -1,0 +1,85 @@
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* FULL SCREEN CENTERING */
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: Arial, sans-serif;
+  background: linear-gradient(#c8e6c9, #a5d6a7);
+}
+
+/* LOGIN CARD */
+.auth-container {
+  width: 320px;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* TEXT */
+.auth-container h1 {
+  color: #2e7d32;
+  margin-bottom: 10px;
+}
+
+.auth-container p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* INPUTS */
+.auth-container input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* BUTTON */
+.auth-container button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+
+  background: #43a047;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.auth-container button:hover {
+  background: #388e3c;
+}
+
+/* LINK */
+.auth-link {
+  margin-top: 15px;
+  font-size: 13px;
+}
+
+.auth-link a {
+  color: #2e7d32;
+  text-decoration: none;
+  font-weight: bold;
+}
