@@ -14,7 +14,7 @@ pool.query(SQLSTATEMENT, VALUES, callback);
 module.exports.getUserCompleteById = (data, callback) =>
 {
     const SQLSTATEMENT = `
-        SELECT user_id ,details FROM UserCompletion
+        SELECT user_id ,details, completed_on  FROM UserCompletion
         WHERE challenge_id = ?;
     `;
     const VALUES = [data.id];

@@ -1,4 +1,4 @@
-const plantsModel = require("../models/plantsModel.JS");
+const plantsModel = require("../models/plantsModel.js");
 // Retrieves all challenges from database
 module.exports.readAllPlants = (req, res, next) =>
 {

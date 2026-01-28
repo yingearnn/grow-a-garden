@@ -15,6 +15,36 @@ DROP TABLE IF EXISTS UserCompletion;
 DROP TABLE IF EXISTS WellnessChallenge;
 DROP TABLE IF EXISTS User;
 DROP TABLE IF EXISTS Plants;
+DROP TABLE IF EXISTS Tools;
+DROP TABLE IF EXISTS UserTools;
+
+
+
+CREATE TABLE Tools (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    multiplier FLOAT NOT NULL,
+    cost INT NOT NULL,
+    max_stock INT NOT NULL,
+    stock INT NOT NULL DEFAULT 0,
+    is_featured BOOLEAN DEFAULT FALSE
+);
+
+
+INSERT INTO Tools (item_id,name, multiplier, cost) VALUES
+(1,'Basic Fertiliser', 1.5, 30, 1000),
+(2,'Silver Fertiliser ', 2.0, 60, 2000),
+(3,'Golden Fertiliser ', 3.0, 120, 3000),
+(4,'Diamond Fertiliser ', 4.0, 180, 4000),
+(5,'Jade Fertiliser ', 5.0, 240, 5000);
+
+CREATE TABLE UserTools (
+    user_tool_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    item_id INT NOT NULL,          -- references Tools table (Fertiliser)
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (item_id) REFERENCES Tools(item_id)
+);
 
 CREATE TABLE Plants (
     plant_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -34,6 +64,19 @@ INSERT INTO Plants (plant_id, name, rarity, points, value) VALUES
 (7, 'Lavender', 'rare', 35, 500),
 (8, 'Venus Flytrap', 'special', 60, 1000),
 (9, 'Cherry Blossom', 'legendary', 120, 3000);
+
+CREATE TABLE GardenPlots (
+    plot_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    plot_number INT NOT NULL,
+    plant_id INT DEFAULT NULL,
+    planted_on DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, plot_number),
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (plant_id) REFERENCES Plants(plant_id)
+);
+
+
 
 CREATE TABLE User (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -57,12 +100,10 @@ CREATE TABLE UserPlants (
     acquired_on DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO UserPlants (user_id, plant_id) VALUES
-(1, 1),
-(2, 1);
+INSERT INTO UserPlants (user_id, plant_id, value) VALUES
+(1, 1,100),
+(2, 1,100);
 
-UPDATE User SET net_worth = 100 WHERE user_id = 1;
-UPDATE User SET net_worth = 100 WHERE user_id = 2;
 
 CREATE TABLE WellnessChallenge (
     challenge_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -86,6 +127,7 @@ CREATE TABLE UserCompletion (
     challenge_id INT NOT NULL,
     user_id INT NOT NULL,
     details TEXT,
+    completed_on DATETIME DEFAULT CURRENT_TIMESTAMP,   -- ADD THIS
     FOREIGN KEY (challenge_id) REFERENCES WellnessChallenge(challenge_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
@@ -94,6 +136,8 @@ INSERT INTO UserCompletion (completion_id, challenge_id, user_id, details) VALUE
 (1, 1, 1, 'completed sleep like a boss'),
 (2, 1, 2, 'completed sleep like a boss');
 `;
+
+
 
   pool.query(SQLSTATEMENT, (error, results) => {
     if (error) {
