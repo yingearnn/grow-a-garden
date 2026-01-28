@@ -10,16 +10,18 @@
   <div class="auth-container">
     <h1>🌱 Garden Game</h1>
     <p>Login to decorate your garden</p>
+  <form id="loginForm">
+    <input type="text"  id="login-username" placeholder="Username">
+    <input type="password" id="login-password" placeholder="Password">
 
-    <input type="text" placeholder="Username">
-    <input type="password" placeholder="Password">
-
-    <button>Login</button>
-
+     <button type="submit" id="login-btn">Login</button>
+    </form>
     <div class="auth-link">
       New player? <a href="register.html">Register here</a>
     </div>
   </div>
-
+ <script src="js/queryCmds.js"></script>
+<script src="js/getCurrentURL.js"></script>
+<script src="js/login.js"></script>
 </body>
 </html>
