@@ -1,6 +1,3 @@
-// ADD TO EXISTING FILE: src/controllers/toolsController.js
-// ADD THESE FUNCTIONS
-
 const toolsModel = require("../models/toolsModel.js");
 
 module.exports.getAllTools = (req, res, next) => {
@@ -57,7 +54,8 @@ module.exports.buyTools = (req, res, next) => {
     const data = {
         user_id: req.body.user_id,
         item_id: req.tool.item_id,
-        points: req.tool.cost
+        cost: req.tool.cost,              // CRITICAL: Pass cost
+        multiplier: req.tool.multiplier   // CRITICAL: Pass actual multiplier value!
     };
 
     const callback = (error, results, fields) => {

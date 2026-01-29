@@ -1,7 +1,6 @@
-// js/shop.js
+// Don't redeclare currentUrl - it's already declared in getCurrentURL.js
 
-const API_BASE = window.location.origin;
-
+// ---------------- Auth Helpers ----------------
 function getToken() {
     return localStorage.getItem('token');
 }
@@ -23,109 +22,162 @@ function logout() {
     window.location.href = 'login.html';
 }
 
+// ---------------- Error Handling ----------------
+function handleFetchError(error, fallbackMessage = 'An error occurred') {
+    console.error(error);
+    alert(fallbackMessage);
+}
+
+function handleUnauthorized() {
+    alert('Session expired. Please login again.');
+    logout();
+}
+
+// ---------------- Load User Data ----------------
 async function loadUserData() {
     const token = getToken();
     const userId = getUserId();
-    
+
     try {
-        const response = await fetch(`${API_BASE}/user/${userId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetch(`${currentUrl}/user/${userId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+
         if (response.status === 401) {
-            logout();
+            handleUnauthorized();
             return;
         }
-        
+
         if (!response.ok) throw new Error('Failed to fetch user data');
-        
+
         const data = await response.json();
         const user = data[0];
-        
+
         document.getElementById('points-display').textContent = `Points: ${user.points}`;
         document.getElementById('networth-display').textContent = `Net Worth: $${user.net_worth}`;
-        
+
         return user;
     } catch (error) {
-        console.error('Error loading user data:', error);
+        handleFetchError(error, 'Error loading user data');
     }
 }
 
+// ---------------- Load Plants ----------------
 async function loadPlants() {
     const token = getToken();
-    
+    const plantsGrid = document.getElementById('plants-grid');
+
+    plantsGrid.innerHTML = '<div class="loading">Loading plants...</div>';
+
     try {
-        const response = await fetch(`${API_BASE}/plants`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetch(`${currentUrl}/plants`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-        
-        if (!response.ok) throw new Error('Failed to fetch plants');
-        
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to fetch plants: ${response.status}`);
+        }
+
         const plants = await response.json();
-        const plantsGrid = document.getElementById('plants-grid');
-        
-        if (plants.length === 0) {
+
+        if (!plants || plants.length === 0) {
             plantsGrid.innerHTML = '<p>No plants available</p>';
             return;
         }
-        
-        plantsGrid.innerHTML = plants.map(plant => {
-            // Random availability - not all plants appear
-            const isAvailable = Math.random() > 0.3;
-            if (!isAvailable) return '';
-            
+
+        const availablePlants = plants.filter(p => p.stock > 0);
+        const featuredPlants = [];
+        const copy = availablePlants.length >= 3 ? [...availablePlants] : [...plants];
+
+        for (let i = 0; i < 3 && copy.length > 0; i++) {
+            const idx = Math.floor(Math.random() * copy.length);
+            featuredPlants.push(copy[idx]);
+            copy.splice(idx, 1);
+        }
+
+        plantsGrid.innerHTML = featuredPlants.map(plant => {
+            const outOfStock = plant.stock <= 0;
             return `
-                <div class="shop-item">
+                <div class="shop-item ${outOfStock ? 'out-of-stock' : ''}">
                     <h3>${plant.name}</h3>
                     <span class="rarity ${plant.rarity}">${plant.rarity.toUpperCase()}</span>
                     <p>Base Value: $${plant.value}</p>
                     <p class="price">Cost: ${plant.points} points</p>
-                    <button class="btn-buy" data-plant-id="${plant.plant_id}" data-cost="${plant.points}">
-                        Buy Plant
+                    <p class="stock">Stock: ${plant.stock}/${plant.max_stock}</p>
+                    <button class="btn-buy" 
+                        data-plant-id="${plant.plant_id}" 
+                        data-cost="${plant.points}" 
+                        ${outOfStock ? 'disabled' : ''}>
+                        ${outOfStock ? 'Out of Stock' : 'Buy Plant'}
                     </button>
                 </div>
             `;
-        }).filter(Boolean).join('');
-        
-        // Add event listeners to buy buttons
-        document.querySelectorAll('.btn-buy').forEach(btn => {
+        }).join('');
+
+        // Add click handlers to active buttons
+        document.querySelectorAll('#plants-grid .btn-buy:not([disabled])').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const plantId = e.target.dataset.plantId;
                 const cost = parseInt(e.target.dataset.cost);
-                await buyPlant(plantId, cost);
+
+                const card = e.target.closest('.shop-item');
+                const stockText = card.querySelector('p.stock');
+
+                const success = await buyPlant(plantId, cost);
+
+                if (success) {
+                    let [current, max] = stockText.textContent.match(/\d+/g).map(Number);
+                    current--;
+
+                    stockText.textContent = `Stock: ${current}/${max}`;
+
+                    if (current <= 0) {
+                        e.target.disabled = true;
+                        e.target.textContent = 'Out of Stock';
+                        card.classList.add('out-of-stock');
+                    }
+                }
             });
         });
+
     } catch (error) {
-        console.error('Error loading plants:', error);
-        document.getElementById('plants-grid').innerHTML = '<p>Error loading plants</p>';
+        plantsGrid.innerHTML = `<p>Error loading plants: ${error.message}</p>`;
     }
 }
 
+// ---------------- Load Tools ----------------
 async function loadTools() {
     const token = getToken();
-    
+    const toolsGrid = document.getElementById('tools-grid');
+
+    toolsGrid.innerHTML = '<div class="loading">Loading tools...</div>';
+
     try {
-        const response = await fetch(`${API_BASE}/tools`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetch(`${currentUrl}/tools`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-        
-        if (!response.ok) throw new Error('Failed to fetch tools');
-        
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error('Failed to fetch tools');
+        }
+
         const tools = await response.json();
-        const toolsGrid = document.getElementById('tools-grid');
-        
-        if (tools.length === 0) {
+
+        if (!tools || tools.length === 0) {
             toolsGrid.innerHTML = '<p>No tools available</p>';
             return;
         }
-        
-        toolsGrid.innerHTML = tools.map(tool => {
+
+        const availableTools = tools.filter(t => t.stock > 0);
+        const toolToFeature = availableTools.length > 0 
+            ? availableTools[Math.floor(Math.random() * availableTools.length)]
+            : tools[Math.floor(Math.random() * tools.length)];
+
+        const featuredTools = [toolToFeature];
+
+        toolsGrid.innerHTML = featuredTools.map(tool => {
             const outOfStock = tool.stock <= 0;
             return `
                 <div class="shop-item ${outOfStock ? 'out-of-stock' : ''}">
@@ -133,155 +185,160 @@ async function loadTools() {
                     <p>Multiplier: ${tool.multiplier}x</p>
                     <p class="price">Cost: ${tool.cost} points</p>
                     <p class="stock">Stock: ${tool.stock}/${tool.max_stock}</p>
-                    <button class="btn-buy" data-tool-id="${tool.item_id}" data-cost="${tool.cost}" data-multiplier="${tool.multiplier}" ${outOfStock ? 'disabled' : ''}>
+                    <button class="btn-buy" 
+                        data-tool-id="${tool.item_id}" 
+                        data-cost="${tool.cost}" 
+                        data-multiplier="${tool.multiplier}" 
+                        ${outOfStock ? 'disabled' : ''}>
                         ${outOfStock ? 'Out of Stock' : 'Buy Tool'}
                     </button>
                 </div>
             `;
         }).join('');
-        
-        // Add event listeners to buy buttons
-        document.querySelectorAll('.btn-buy:not([disabled])').forEach(btn => {
+
+        // Add click handlers
+        document.querySelectorAll('#tools-grid .btn-buy:not([disabled])').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const toolId = e.target.dataset.toolId;
                 const cost = parseInt(e.target.dataset.cost);
                 const multiplier = parseFloat(e.target.dataset.multiplier);
-                await buyTool(toolId, cost, multiplier);
+
+                const card = e.target.closest('.shop-item');
+                const stockText = card.querySelector('p.stock');
+
+                const success = await buyTool(toolId, cost, multiplier);
+
+                if (success) {
+                    let [current, max] = stockText.textContent.match(/\d+/g).map(Number);
+                    current--;
+
+                    stockText.textContent = `Stock: ${current}/${max}`;
+
+                    if (current <= 0) {
+                        e.target.disabled = true;
+                        e.target.textContent = 'Out of Stock';
+                        card.classList.add('out-of-stock');
+                    }
+                }
             });
         });
+
     } catch (error) {
-        console.error('Error loading tools:', error);
-        document.getElementById('tools-grid').innerHTML = '<p>Error loading tools</p>';
+        toolsGrid.innerHTML = `<p>Error loading tools: ${error.message}</p>`;
     }
 }
 
+// ---------------- Buy Plant ----------------
 async function buyPlant(plantId, cost) {
-    const token = getToken();
-    const userId = getUserId();
-    
-    // Check user has enough points
     const user = await loadUserData();
     if (!user || user.points < cost) {
         alert('Insufficient points!');
-        return;
+        return false;
     }
-    
+
     try {
-        const response = await fetch(`${API_BASE}/plants/${plantId}/buy`, {
+        const response = await fetch(`${currentUrl}/plants/${plantId}/buy`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': `Bearer ${getToken()}` 
             },
-            body: JSON.stringify({ user_id: parseInt(userId) })
+            body: JSON.stringify({ user_id: parseInt(getUserId()) })
         });
-        
+
         if (response.status === 401) {
-            logout();
-            return;
+            handleUnauthorized();
+            return false;
         }
-        
+
         if (!response.ok) {
             const error = await response.json();
-            alert(error.message || 'Failed to purchase plant');
-            return;
+            handleFetchError(error, error.message || 'Failed to purchase plant');
+            return false;
         }
-        
-        const data = await response.json();
-        alert('Plant purchased successfully! Check your inventory.');
-        
-        // Reload user data and plants
+
+        alert('Plant purchased successfully!');
         await loadUserData();
-        await loadPlants();
+        return true;
     } catch (error) {
-        console.error('Error buying plant:', error);
-        alert('Error purchasing plant');
+        handleFetchError(error, 'Error purchasing plant');
+        return false;
     }
 }
 
+// ---------------- Buy Tool ----------------
 async function buyTool(toolId, cost, multiplier) {
-    const token = getToken();
-    const userId = getUserId();
-    
-    // Check user has enough points
     const user = await loadUserData();
     if (!user || user.points < cost) {
         alert('Insufficient points!');
-        return;
+        return false;
     }
-    
-    if (!confirm(`This tool will multiply all your planted plants' value by ${multiplier}x. Continue?`)) {
-        return;
-    }
-    
+
+    if (!confirm(`This tool will multiply all your planted plants' value by ${multiplier}x. Continue?`)) return false;
+
     try {
-        const response = await fetch(`${API_BASE}/tools/${toolId}/buy`, {
+        const response = await fetch(`${currentUrl}/tools/${toolId}/buy`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ user_id: parseInt(userId) })
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+            body: JSON.stringify({ user_id: parseInt(getUserId()) })
         });
-        
-        if (response.status === 401) {
-            logout();
-            return;
-        }
-        
+
+        if (response.status === 401) return handleUnauthorized();
         if (!response.ok) {
             const error = await response.json();
-            alert(error.message || 'Failed to purchase tool');
-            return;
+            handleFetchError(error, error.message || 'Failed to purchase tool');
+            return false;
         }
-        
-        const data = await response.json();
+
         alert('Tool purchased! All planted plants have been boosted!');
-        
-        // Reload user data and tools
         await loadUserData();
-        await loadTools();
+        return true;
+
     } catch (error) {
-        console.error('Error buying tool:', error);
-        alert('Error purchasing tool');
+        handleFetchError(error, 'Error purchasing tool');
+        return false;
     }
 }
 
-function startShopRefreshTimer() {
-    function updateTimer() {
+// ---------------- Shop Refresh Timer ----------------
+async function startShopRefreshTimer() {
+    async function updateTimer() {
         const now = new Date();
         const minutes = now.getMinutes();
         const seconds = now.getSeconds();
-        
+
         const minutesMod = minutes % 5;
         const minutesUntilRefresh = (5 - minutesMod) % 5;
         const secondsUntilRefresh = 60 - seconds;
-        
+
         const totalSeconds = (minutesUntilRefresh * 60 + secondsUntilRefresh) % 300;
         const displayMinutes = Math.floor(totalSeconds / 60);
         const displaySeconds = totalSeconds % 60;
-        
-        document.getElementById('timer-value').textContent = 
+
+        document.getElementById('timer-value').textContent =
             `${displayMinutes}:${displaySeconds.toString().padStart(2, '0')}`;
-        
-        // Reload shop when timer hits 0
+
         if (totalSeconds === 0) {
-            loadPlants();
-            loadTools();
+            await loadPlants();
+            await loadTools();
         }
     }
-    
+
     updateTimer();
     setInterval(updateTimer, 1000);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// ---------------- DOMContentLoaded ----------------
+document.addEventListener('DOMContentLoaded', async () => {
     checkAuth();
-    loadUserData();
-    loadPlants();
-    loadTools();
+
+    await loadUserData();
+
+    await loadPlants();
+    await loadTools();
+
     startShopRefreshTimer();
-    
+
     document.getElementById('logout-btn').addEventListener('click', logout);
     document.getElementById('refresh-shop-btn').addEventListener('click', () => {
         loadPlants();

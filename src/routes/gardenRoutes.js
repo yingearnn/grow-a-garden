@@ -14,8 +14,9 @@ router.post(
     '/plant',
     gardenController.checkInventory,
     gardenController.checkPlot,
-    gardenController.removeFromInventory,
-    gardenController.plantIntoPlot
+    gardenController.plantIntoPlot,
+    gardenController.markAsPlanted
+    
 );
 
 // Sell a planted plant

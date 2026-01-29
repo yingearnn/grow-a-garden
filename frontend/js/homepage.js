@@ -1,25 +1,20 @@
-// js/homepage.js
+// Don't redeclare currentUrl - it's already declared in getCurrentURL.js
 
-const API_BASE = window.location.origin;
-
-// Get JWT from localStorage
+// ---------------- Auth Helpers ----------------
 function getToken() {
     return localStorage.getItem('token');
 }
 
-// Get user ID from localStorage
 function getUserId() {
     return localStorage.getItem('userId');
 }
 
-// Redirect if not authenticated
 function checkAuth() {
     if (!getToken() || !getUserId()) {
         window.location.href = 'login.html';
     }
 }
 
-// Logout functionality
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
@@ -27,163 +22,236 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-// Fetch user data and update stats
+// ---------------- Load User Data ----------------
 async function loadUserData() {
     const token = getToken();
     const userId = getUserId();
-    
+
     try {
-        const response = await fetch(`${API_BASE}/user/${userId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetch(`${currentUrl}/user/${userId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+
         if (response.status === 401) {
+            alert('Session expired. Please login again.');
             logout();
             return;
         }
-        
+
         if (!response.ok) throw new Error('Failed to fetch user data');
-        
+
         const data = await response.json();
         const user = data[0];
-        
+
         document.getElementById('username-display').textContent = user.username;
         document.getElementById('points-display').textContent = `Points: ${user.points}`;
         document.getElementById('networth-display').textContent = `Net Worth: $${user.net_worth}`;
-        
-        localStorage.setItem('username', user.username);
+
+        return user;
     } catch (error) {
         console.error('Error loading user data:', error);
+        alert('Error loading user data: ' + error.message);
     }
 }
 
-// Load challenges preview
-async function loadChallenges() {
-    const token = getToken();
-    
-    try {
-        const response = await fetch(`${API_BASE}/challenges`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch challenges');
-        
-        const challenges = await response.json();
-        const challengesList = document.getElementById('challenges-list');
-        
-        if (challenges.length === 0) {
-            challengesList.innerHTML = '<p>No challenges available</p>';
-            return;
-        }
-        
-        challengesList.innerHTML = challenges.slice(0, 3).map(challenge => `
-            <div class="challenge-item">
-                <h4>${challenge.description}</h4>
-                <p>Points: ${challenge.points}</p>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error('Error loading challenges:', error);
-        document.getElementById('challenges-list').innerHTML = '<p>Error loading challenges</p>';
-    }
-}
-
-// Load inventory count
-async function loadInventoryCount() {
+// ---------------- Load Garden Plots ----------------
+async function loadGardenPlots() {
     const token = getToken();
     const userId = getUserId();
-    
+    const gardenPlotsDiv = document.getElementById('garden-plots');
+
+    gardenPlotsDiv.innerHTML = '<div class="loading">Loading garden...</div>';
+
     try {
-        const response = await fetch(`${API_BASE}/plants/${userId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        // FIXED: Use correct endpoint /garden/:userId
+        const response = await fetch(`${currentUrl}/garden/${userId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-        
-        if (response.status === 404) {
-            document.getElementById('plant-count').textContent = '0';
+
+        if (response.status === 401) {
+            alert('Session expired. Please login again.');
+            logout();
             return;
         }
-        
-        if (!response.ok) throw new Error('Failed to fetch inventory');
-        
-        const plants = await response.json();
-        document.getElementById('plant-count').textContent = plants.length;
-    } catch (error) {
-        console.error('Error loading inventory:', error);
-        document.getElementById('plant-count').textContent = '0';
-    }
-}
 
-// Load garden plots count
-async function loadGardenInfo() {
-    const token = getToken();
-    const userId = getUserId();
-    
-    try {
-        const response = await fetch(`${API_BASE}/garden/${userId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch garden info');
-        
+        if (!response.ok) {
+            console.error('Garden fetch failed:', response.status, response.statusText);
+            throw new Error('Failed to fetch garden plots');
+        }
+
         const plots = await response.json();
-        const plantedCount = plots.filter(plot => plot.plant_id !== null).length;
-        document.getElementById('plots-used').textContent = plantedCount;
+        console.log('Garden plots:', plots);
+
+        let plotsUsed = 0;
+        let totalValue = 0;
+
+        // Create 20 plots
+        gardenPlotsDiv.innerHTML = '';
+        for (let i = 1; i <= 20; i++) {
+            const plot = plots.find(p => p.plot_number === i);
+            const isEmpty = !plot || !plot.plant_id;
+
+            if (!isEmpty) {
+                plotsUsed++;
+                totalValue += plot.value || 0;
+            }
+
+            const plotDiv = document.createElement('div');
+            plotDiv.className = `garden-plot ${isEmpty ? 'empty' : 'planted'}`;
+            plotDiv.dataset.plotNumber = i;
+
+            if (isEmpty) {
+                plotDiv.innerHTML = `
+                    <div class="plot-content">
+                        <p class="plot-number">#${i}</p>
+                        <p class="plot-status">Empty</p>
+                    </div>
+                `;
+            } else {
+                plotDiv.innerHTML = `
+                    <div class="plot-content">
+                        <p class="plot-number">#${i}</p>
+                        <p class="plant-name">${plot.name || 'Unknown'}</p>
+                        <p class="plant-value">$${plot.value || 0}</p>
+                        <button class="btn-harvest" data-plot-number="${plot.plot_number}">Harvest</button>
+                    </div>
+                `;
+            }
+
+            gardenPlotsDiv.appendChild(plotDiv);
+        }
+
+        // Update stats
+        document.getElementById('plots-used').textContent = plotsUsed;
+        document.getElementById('garden-value').textContent = totalValue;
+
+        // Add harvest button handlers
+        document.querySelectorAll('.btn-harvest').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const plotNumber = e.target.dataset.plotNumber;
+                await harvestPlant(plotNumber);
+            });
+        });
+
     } catch (error) {
-        console.error('Error loading garden info:', error);
-        document.getElementById('plots-used').textContent = '0';
+        console.error('Error loading garden plots:', error);
+        gardenPlotsDiv.innerHTML = `<p>Error loading garden: ${error.message}</p>`;
     }
 }
 
-// Calculate and display shop refresh timer
-function startShopRefreshTimer() {
-    function updateTimer() {
-        const now = new Date();
-        const minutes = now.getMinutes();
-        const seconds = now.getSeconds();
+// ---------------- Harvest Plant ----------------
+async function harvestPlant(plotNumber) {
+    const token = getToken();
+    const userId = getUserId();
+
+    try {
+        // Use the existing /garden/sell endpoint
+        const response = await fetch(`${currentUrl}/garden/sell`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                user_id: parseInt(userId),
+                plot_number: parseInt(plotNumber)
+            })
+        });
+
+        if (response.status === 401) {
+            alert('Session expired. Please login again.');
+            logout();
+            return;
+        }
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to harvest plant');
+        }
+
+        const result = await response.json();
+        alert(`Plant harvested successfully! Check your net worth.`);
         
-        // Calculate time until next 5-minute mark
-        const minutesMod = minutes % 5;
-        const minutesUntilRefresh = (5 - minutesMod) % 5;
-        const secondsUntilRefresh = 60 - seconds;
-        
-        const totalSeconds = (minutesUntilRefresh * 60 + secondsUntilRefresh) % 300;
-        const displayMinutes = Math.floor(totalSeconds / 60);
-        const displaySeconds = totalSeconds % 60;
-        
-        document.getElementById('shop-refresh-timer').textContent = 
-            `Shop refreshes in: ${displayMinutes}:${displaySeconds.toString().padStart(2, '0')}`;
+        // Reload user data and garden
+        await loadUserData();
+        await loadGardenPlots();
+
+    } catch (error) {
+        console.error('Error harvesting plant:', error);
+        alert('Error harvesting plant: ' + error.message);
     }
-    
-    updateTimer();
-    setInterval(updateTimer, 1000);
 }
 
-// Initialize page
-document.addEventListener('DOMContentLoaded', () => {
+// ---------------- Harvest All Plants ----------------
+async function harvestAllPlants() {
+    const token = getToken();                      // /:userId
+    const userId = getUserId();
+
+    try {
+        // Get all plots first
+        const response = await fetch(`${currentUrl}/garden/${userId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('No plants planted');
+
+        const plots = await response.json();
+        const plantedPlots = plots.filter(p => p.plant_id !== null);
+
+        if (plantedPlots.length === 0) {
+            alert('No plants to harvest!');
+            return;
+        }
+
+        let harvested = 0;
+        for (const plot of plantedPlots) {
+            try {
+                const sellResponse = await fetch(`${currentUrl}/garden/sell`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        user_id: parseInt(userId),
+                        plot_number: plot.plot_number
+                    })
+                });
+
+                if (sellResponse.ok) {
+                    harvested++;
+                }
+            } catch (err) {
+                console.error('Error harvesting plot:', plot.plot_number, err);
+            }
+        }
+
+        alert(`Harvested ${harvested} plants! Check your points and net worth.`);
+        
+        // Reload user data and garden
+        await loadUserData();
+        await loadGardenPlots();
+
+    } catch (error) {
+        console.error('Error harvesting all plants:', error);
+        alert('Error harvesting all plants: ' + error.message);
+    }
+}
+
+// ---------------- DOMContentLoaded ----------------
+document.addEventListener('DOMContentLoaded', async () => {
     checkAuth();
-    loadUserData();
-    loadChallenges();
-    loadInventoryCount();
-    loadGardenInfo();
-    startShopRefreshTimer();
-    
-    // Event listeners
+
+    // Load user data and garden
+    await loadUserData();
+    await loadGardenPlots();
+
+    // Add event listeners
     document.getElementById('logout-btn').addEventListener('click', logout);
-    document.getElementById('view-shop-btn').addEventListener('click', () => {
-        window.location.href = 'shop.html';
-    });
-    document.getElementById('view-inventory-btn').addEventListener('click', () => {
-        window.location.href = 'inventory.html';
-    });
-    document.getElementById('view-garden-btn').addEventListener('click', () => {
-        window.location.href = 'garden.html';
-    });
+    
+    const harvestAllBtn = document.getElementById('harvest-all-btn');
+    if (harvestAllBtn) {
+        harvestAllBtn.addEventListener('click', harvestAllPlants);
+    }
 });

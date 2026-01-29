@@ -1,6 +1,5 @@
 // js/inventory.js
 
-const API_BASE = window.location.origin;
 
 function getToken() {
     return localStorage.getItem('token');
@@ -28,7 +27,7 @@ async function loadUserData() {
     const userId = getUserId();
     
     try {
-        const response = await fetch(`${API_BASE}/user/${userId}`, {
+        const response = await fetch(`${currentUrl}/user/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -56,7 +55,7 @@ async function loadInventory() {
     const userId = getUserId();
     
     try {
-        const response = await fetch(`${API_BASE}/plants/${userId}`, {
+        const response = await fetch(`${currentUrl}/plants/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -117,7 +116,9 @@ function openPlantModal(userPlantId, plantId, plantName) {
     form.onsubmit = async (e) => {
         e.preventDefault();
         const plotNumber = parseInt(document.getElementById('plot-number').value);
-        await plantInGarden(plantId, plotNumber);
+
+        // Pass user_plant_id instead of plant_id
+        await plantInGarden(userPlantId, plotNumber);
     };
 }
 
@@ -127,7 +128,7 @@ function closeModal() {
     document.getElementById('plot-number').value = '';
 }
 
-async function plantInGarden(plantId, plotNumber) {
+async function plantInGarden(userPlantId, plotNumber) {
     const token = getToken();
     const userId = getUserId();
     
@@ -137,17 +138,17 @@ async function plantInGarden(plantId, plotNumber) {
     }
     
     try {
-        const response = await fetch(`${API_BASE}/garden/plant`, {
+        const response = await fetch(`${currentUrl}/garden/plant`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
-                user_id: parseInt(userId),
-                plant_id: parseInt(plantId),
-                plot_number: plotNumber
-            })
+           body: JSON.stringify({
+    user_id: parseInt(userId),
+    user_plant_id: parseInt(userPlantId), // MUST be user_plant_id
+    plot_number: plotNumber
+})
         });
         
         if (response.status === 401) {

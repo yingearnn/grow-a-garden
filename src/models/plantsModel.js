@@ -3,10 +3,10 @@ const pool = require('../services/db');
 module.exports.selectAllPlants = (callback) =>
 {
     const SQLSTATEMENT = `
-    SELECT * FROM Plants ;
+    SELECT * FROM Plants;
     `;
 
-pool.query(SQLSTATEMENT, callback);
+    pool.query(SQLSTATEMENT, callback);
 }
 
 module.exports.selectPlantsById = (data, callback) =>  
@@ -15,38 +15,46 @@ module.exports.selectPlantsById = (data, callback) =>
     SELECT * FROM Plants
     WHERE plant_id = ?;        
     `;
-const VALUES = [data.id];
+    const VALUES = [data.id];
 
-pool.query(SQLSTATEMENT, VALUES, callback);
+    pool.query(SQLSTATEMENT, VALUES, callback);
 }
 
 module.exports.boughtPlant = (data, callback) => 
 {
     const SQLSTATEMENT = `
-    INSERT INTO UserPlants (user_id , plant_id) 
-    VALUES (?,?);
+    INSERT INTO UserPlants (user_id, plant_id) 
+    VALUES (?, ?);
 
     UPDATE User 
     SET points = points - ? 
-    WHERE user_id = ? ;
-    `
-    
-    
-    ;
-const VALUES = [data.user_id , data.plant_id, data.points , data.user_id];
+    WHERE user_id = ?;
 
-pool.query(SQLSTATEMENT, VALUES, callback);
+    UPDATE Plants
+    SET stock = stock - 1
+    WHERE plant_id = ?;
+    `;
+
+    const VALUES = [data.user_id, data.plant_id, data.points, data.user_id, data.plant_id];
+
+    pool.query(SQLSTATEMENT, VALUES, callback);
 }
 
 module.exports.getOwned = (data, callback) =>
 {
     const SQLSTATEMENT = `
-        SELECT User.user_id, User.username, Plants.name , Plants.plant_id FROM UserPlants 
-        INNER JOIN Plants ON UserPlants.plant_id = Plants.plant_id 
-        INNER JOIN User ON UserPlants.user_id = User.user_id 
-        WHERE User.user_id = ?
-        
-
+        SELECT 
+            up.user_plant_id,
+            up.plant_id,
+            up.acquired_on,
+            p.name,
+            p.rarity,
+            p.value
+        FROM UserPlants up
+        JOIN Plants p ON up.plant_id = p.plant_id
+        WHERE up.user_id = ?
+          AND up.is_planted = FALSE   -- <--- only show unplanted plants
+        ORDER BY up.acquired_on DESC;
     `;
     const VALUES = [data.id];
 

@@ -1,4 +1,6 @@
 const userModel = require("../models/userModel.js");
+const gardenModel = require("../models/gardenModel.js");
+
 // Retrieve all users
 module.exports.readAllUser = (req, res, next) =>
 {
@@ -33,7 +35,7 @@ module.exports.readUserById = (req, res, next) =>
                 });
             }
             else 
-                return res.status(200).json(results[0]);
+                return res.status(200).json(results);
 
 
 
@@ -74,8 +76,21 @@ module.exports.createNewUser = (req, res, next) => {
             return res.status(500).json(error);
         }
 
-        // 4. Pass userId to JWT middleware
-        res.locals.user_id =results.insertId;
+        // 4. Initialize garden plots for new user
+        const userId = results.insertId;
+        const plotData = { user_id: userId };
+        
+        gardenModel.initializePlotsForUser(plotData, (plotError) => {
+            if (plotError) {
+                console.error("Error initializing plots:", plotError);
+                // Continue anyway - plots can be created later
+            } else {
+                console.log(`Garden plots initialized for user ${userId}`);
+            }
+        });
+
+        // 5. Pass userId to JWT middleware
+        res.locals.user_id = userId;
         res.locals.message = "Registration successful";
         next();
     };
@@ -132,6 +147,7 @@ module.exports.updateUserById = (req, res, next) =>
 
     userModel.updateUserById(data, callback);
 }
+
 // Middleware: Validate user exists
 module.exports.validateUser = (req, res, next) =>
 {
@@ -150,12 +166,10 @@ module.exports.validateUser = (req, res, next) =>
                     message: "User not found"
                 });
             }
-            else 
-               req.user = results[0]
+            else {
+               req.user = results[0];
                return next();
-
-
-
+            }
         }
     }
 
@@ -200,6 +214,3 @@ module.exports.login = (req, res, next) => {
         res.status(500).json(error);
     }
 };
-
-
-

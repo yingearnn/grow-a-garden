@@ -1,4 +1,5 @@
-/* css/homepage.css */
+/* Homepage CSS - Fixed Garden-Centered Layout */
+
 * {
   margin: 0;
   padding: 0;
@@ -9,11 +10,11 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
-  color: #333;
 }
 
+/* Top Navigation Bar */
 .top-bar {
-  background: #fff;
+  background: white;
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -22,180 +23,253 @@ body {
 }
 
 .logo h1 {
+  color: #4CAF50;
   font-size: 1.5rem;
-  color: #667eea;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  color: #333;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  background: #4CAF50;
+  color: white;
 }
 
 .stats {
   display: flex;
-  gap: 2rem;
-}
-
-.stats span {
+  gap: 1.5rem;
   font-weight: 600;
-  color: #555;
+  color: #333;
 }
 
 .btn-logout {
-  background: #f56565;
+  background: #f44336;
   color: white;
   border: none;
   padding: 0.5rem 1.5rem;
   border-radius: 5px;
   cursor: pointer;
   font-weight: 600;
-  transition: background 0.3s;
+  transition: background 0.3s ease;
 }
 
 .btn-logout:hover {
-  background: #e53e3e;
+  background: #d32f2f;
 }
 
-.dashboard {
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+/* Main Garden View */
+.garden-main {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+.garden-container {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.garden-container h2 {
+  color: #4CAF50;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.garden-stats {
+  display: flex;
   gap: 2rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.garden-stats span {
+  font-weight: 700;
+  color: #4CAF50;
+}
+
+/* Garden Grid */
+.garden-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
   margin-bottom: 2rem;
 }
 
-.card {
-  background: white;
+.garden-plot {
+  aspect-ratio: 1;
+  border: 3px solid #ddd;
   border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.card:hover {
+.garden-plot.empty {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.garden-plot.empty:hover {
+  background: #efefef;
+  border-color: #999;
+}
+
+.garden-plot.planted {
+  background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+  border-color: #4CAF50;
+}
+
+.garden-plot.planted:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
 }
 
-.card-header h2 {
-  color: #667eea;
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
+.plot-content {
+  text-align: center;
+  width: 100%;
 }
 
-.card-header p {
-  color: #666;
+.plot-number {
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 0.3rem;
+}
+
+.plot-status {
+  color: #999;
   font-size: 0.9rem;
 }
 
-.challenges-list {
-  margin-top: 1rem;
-  max-height: 300px;
-  overflow-y: auto;
+.plant-name {
+  font-weight: 700;
+  color: #2e7d32;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
 }
 
-.challenge-item {
-  background: #f7fafc;
-  padding: 1rem;
+.plant-value {
+  color: #4CAF50;
+  font-weight: 600;
   margin-bottom: 0.5rem;
+}
+
+.btn-harvest {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.8rem;
   border-radius: 5px;
-  border-left: 4px solid #667eea;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.3s ease;
 }
 
-.challenge-item h4 {
-  color: #333;
-  margin-bottom: 0.5rem;
+.btn-harvest:hover {
+  background: #45a049;
 }
 
-.challenge-item p {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.shop-info, .inventory-summary, .garden-info {
-  margin-top: 1rem;
-}
-
-.shop-info p, .inventory-summary p, .garden-info p {
-  margin-bottom: 1rem;
-  color: #666;
+/* Garden Actions */
+.garden-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 }
 
 .btn-primary, .btn-secondary {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
   font-weight: 600;
-  transition: all 0.3s;
-  display: inline-block;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
   text-decoration: none;
-  text-align: center;
+  display: inline-block;
 }
 
 .btn-primary {
-  background: #667eea;
+  background: #4CAF50;
   color: white;
 }
 
 .btn-primary:hover {
-  background: #5568d3;
+  background: #45a049;
+  transform: translateY(-2px);
 }
 
 .btn-secondary {
-  background: #edf2f7;
-  color: #667eea;
+  background: #2196F3;
+  color: white;
 }
 
 .btn-secondary:hover {
-  background: #e2e8f0;
-}
-
-.nav-buttons {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 2rem;
-}
-
-.nav-link {
-  padding: 1rem 2rem;
-  background: white;
-  color: #667eea;
-  text-decoration: none;
-  border-radius: 10px;
-  font-weight: 600;
-  transition: all 0.3s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.nav-link:hover {
-  background: #667eea;
-  color: white;
+  background: #0b7dda;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
+/* Loading State */
 .loading {
   text-align: center;
   padding: 2rem;
   color: #666;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .garden-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
+  .top-bar {
+    flex-wrap: wrap;
+    gap: 1rem;
   }
   
-  .top-bar {
+  .nav-menu {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .garden-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .garden-stats {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .garden-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   
   .stats {
     flex-direction: column;
     gap: 0.5rem;
-    text-align: center;
+    font-size: 0.9rem;
   }
 }
