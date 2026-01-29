@@ -69,3 +69,24 @@ module.exports.addSellValue = (data, callback) =>
     `;
     pool.query(SQL, [data.value, data.value, data.user_id], callback);
 };
+
+module.exports.getAllPlots = (data, callback) => {
+    const SQLSTATEMENT = `
+    SELECT 
+        gp.plot_id,
+        gp.plot_number,
+        gp.plant_id,
+        gp.planted_on,
+        p.name,
+        p.rarity,
+        gp.value
+    FROM GardenPlots gp
+    LEFT JOIN UserPlants up ON gp.plant_id = up.user_plant_id
+    LEFT JOIN Plants p ON up.plant_id = p.plant_id
+    WHERE gp.user_id = ?
+    ORDER BY gp.plot_number ASC;
+    `;
+    const VALUES = [data.user_id];
+
+    pool.query(SQLSTATEMENT, VALUES, callback);
+};

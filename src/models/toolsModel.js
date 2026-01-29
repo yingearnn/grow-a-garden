@@ -46,3 +46,12 @@ WHERE gp.user_id = ? AND gp.plant_id IS NOT NULL;
 
     pool.query(SQLSTATEMENT, VALUES, callback);
 };
+
+module.exports.selectAllTools = (callback) => {
+    const SQLSTATEMENT = `
+    SELECT * FROM Tools
+    ORDER BY cost ASC;
+    `;
+
+    pool.query(SQLSTATEMENT, callback);
+};

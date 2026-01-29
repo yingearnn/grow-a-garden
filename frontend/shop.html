@@ -1,0 +1,54 @@
+<!-- shop.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garden Game – Shop</title>
+  <link rel="stylesheet" href="css/shop.css">
+</head>
+<body>
+  <header class="top-bar">
+    <div class="logo">
+      <a href="homepage.html">🌱 Garden Wellness</a>
+    </div>
+    <div class="stats">
+      <span id="points-display">Points: 0</span>
+      <span id="networth-display">Net Worth: $0</span>
+    </div>
+    <button id="logout-btn" class="btn-logout">Logout</button>
+  </header>
+
+  <main class="shop-container">
+    <div class="shop-header">
+      <h1>🛒 Shop</h1>
+      <p id="refresh-timer">Shop refreshes in: <span id="timer-value">--:--</span></p>
+      <button id="refresh-shop-btn" class="btn-refresh" disabled>Manual Refresh</button>
+    </div>
+
+    <!-- Plants Section -->
+    <section class="shop-section">
+      <h2>🌿 Plants Available</h2>
+      <div id="plants-grid" class="shop-grid">
+        <div class="loading">Loading plants...</div>
+      </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section class="shop-section">
+      <h2>🔧 Fertilizers (Tools)</h2>
+      <p class="tools-info">Fertilizers multiply the value of all your planted plants!</p>
+      <div id="tools-grid" class="shop-grid">
+        <div class="loading">Loading tools...</div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="homepage.html" class="btn-secondary">← Back to Dashboard</a>
+    </div>
+  </main>
+ <script src="js/queryCmds.js"></script>
+<script src="js/getCurrentURL.js"></script>
+  <script src="js/shop.js"></script>
+</body>
+</html>

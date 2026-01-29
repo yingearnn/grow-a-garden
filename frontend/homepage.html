@@ -2,65 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Garden Game – Home</title>
-  <link rel="stylesheet" href="css/garden.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garden Game – Homepage</title>
+  <link rel="stylesheet" href="css/homepage.css">
 </head>
 <body>
-  <!-- Top bar -->
+  <!-- Top navigation bar -->
   <header class="top-bar">
+    <div class="logo">
+      <h1>🌱 Garden Wellness</h1>
+    </div>
     <div class="stats">
-      <span id="points">Points: 0</span>
-      <span id="networth">Net Worth: 0</span>
+      <span id="username-display">Loading...</span>
+      <span id="points-display">Points: 0</span>
+      <span id="networth-display">Net Worth: $0</span>
     </div>
-    <div class="actions">
-      <button id="shop-btn">Shop</button>
-      <button id="logout-btn">Logout</button>
-    </div>
+    <button id="logout-btn" class="btn-logout">Logout</button>
   </header>
 
-  <!-- Main garden layout -->
-  <main class="garden-main">
-    <!-- Garden plot -->
-    <section class="garden-plot">
-      <h2>🌱 My Garden</h2>
-      <div id="plot-container" class="plot-grid">
-        <!-- Grid cells will be generated dynamically -->
-         
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-    <div class="plot-cell"></div>
-  </div>
-     
+  <!-- Main dashboard content -->
+  <main class="dashboard">
+    <div class="dashboard-grid">
+      <!-- Wellness Challenges Card -->
+      <div class="card card-challenges">
+        <div class="card-header">
+          <h2>🏆 Wellness Challenges</h2>
+          <p>Complete daily wellness tasks to earn points</p>
+        </div>
+        <div id="challenges-list" class="challenges-list">
+          <!-- Challenges will be loaded dynamically -->
+          <div class="loading">Loading challenges...</div>
+        </div>
+      </div>
 
-    </section>
+      <!-- Shop Card -->
+      <div class="card card-shop">
+        <div class="card-header">
+          <h2>🛒 Shop</h2>
+          <p>Buy plants and tools with your points</p>
+        </div>
+        <div class="shop-info">
+          <p id="shop-refresh-timer">Shop refreshes in: --:--</p>
+          <button id="view-shop-btn" class="btn-primary">Visit Shop</button>
+        </div>
+      </div>
 
-    <!-- Inventory -->
-    <aside class="inventory">
-      <h3>Inventory</h3>
-      <div id="inventory-list"></div>
-    </aside>
+      <!-- Inventory Card -->
+      <div class="card card-inventory">
+        <div class="card-header">
+          <h2>📦 My Inventory</h2>
+          <p>Manage your purchased plants</p>
+        </div>
+        <div id="inventory-summary" class="inventory-summary">
+          <p>Plants owned: <span id="plant-count">0</span></p>
+          <button id="view-inventory-btn" class="btn-secondary">View Inventory</button>
+        </div>
+      </div>
+
+      <!-- Garden Card -->
+      <div class="card card-garden">
+        <div class="card-header">
+          <h2>🌻 My Garden</h2>
+          <p>Plant and grow your collection</p>
+        </div>
+        <div class="garden-info">
+          <p>Plots used: <span id="plots-used">0</span>/20</p>
+          <button id="view-garden-btn" class="btn-primary">Manage Garden</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="nav-buttons">
+      <a href="challenges.html" class="nav-link">Complete Challenges</a>
+      <a href="shop.html" class="nav-link">Browse Shop</a>
+      <a href="inventory.html" class="nav-link">View Inventory</a>
+      <a href="garden.html" class="nav-link">Tend Garden</a>
+    </div>
   </main>
-
-  <!-- Scripts -->
-  <script src="js/currentUrl.js"></script>
-  <script src="js/fetchMethod.js"></script>
-  <script src="js/garden.js"></script>
+   <script src="js/queryCmds.js"></script>
+<script src="js/getCurrentURL.js"></script>
+  <script src="js/homepage.js"></script>
 </body>
 </html>

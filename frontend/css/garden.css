@@ -1,73 +1,331 @@
-body {
-  font-family: Arial, sans-serif;
+/* css/garden.css */
+* {
   margin: 0;
-  background: #e0f7fa;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #333;
 }
 
 .top-bar {
+  background: #fff;
+  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
-  background: #00796b;
-  color: white;
-  padding: 10px 20px;
   align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.top-bar button {
-  margin-left: 10px;
-  padding: 5px 10px;
-  cursor: pointer;
+.logo a {
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
 }
 
-.garden-main {
+.stats {
   display: flex;
-  padding: 20px;
-  gap: 20px;
+  gap: 2rem;
+}
+
+.stats span {
+  font-weight: 600;
+  color: #555;
+}
+
+.btn-logout {
+  background: #f56565;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.btn-logout:hover {
+  background: #e53e3e;
+}
+
+.garden-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.garden-header {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.garden-header h1 {
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.garden-header p {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.plots-info {
+  color: #333;
+  font-weight: 600;
+}
+
+.garden-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .garden-plot {
-  width: 100%;               /* full width in container */
-  height: 400px;             /* adjust as needed */
+  aspect-ratio: 1;
+  background: #f7fafc;
+  border: 3px solid #e2e8f0;
   border-radius: 10px;
-  background-image: url("../images/soil.jpg"); /* relative to CSS file */
-  background-size: cover;    /* make the image cover entire div */
-  background-position: center; /* center the image */
-  background-repeat: no-repeat; /* don’t tile */
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* optional shading for depth */
-  position: relative;        /* allows overlaying cells if needed */
-
-  display: grid; /* enable CSS Grid */
-  grid-template-columns: repeat(5, 1fr); /* 5 columns */
-  grid-template-rows: repeat(4, 1fr);    /* 4 rows */
-  gap: 10px; /* space between cells */
-  padding: 10px; /* optional spacing inside the plot */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  padding: 0.5rem;
+  text-align: center;
 }
 
-.plot-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 80px); /* 5 columns */
-  grid-template-rows: repeat(4, 80px);   /* 4 rows */
-  gap: 10px;
+.garden-plot .plot-number {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #999;
 }
 
-.plot-cell {
-  border: 2px solid rgba(93, 64, 55, 0.7); /* brown border */
-  border-radius: 8px;
-  background-color: transparent; /* no color inside */
+.garden-plot.empty {
+  background: #f7fafc;
+  border-color: #cbd5e0;
 }
 
+.garden-plot.empty:hover {
+  border-color: #a0aec0;
+  background: #edf2f7;
+}
 
-.inventory {
-  flex: 1;
-  background: #fff9c4;
-  padding: 20px;
+.garden-plot.planted {
+  background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+  border-color: #48bb78;
+}
+
+.garden-plot.planted:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(72, 187, 120, 0.3);
+}
+
+.garden-plot .plot-icon {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.garden-plot .plot-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.garden-plot .plot-value {
+  font-size: 0.8rem;
+  color: #48bb78;
+  font-weight: 600;
+}
+
+.garden-legend {
+  background: white;
+  padding: 1.5rem;
   border-radius: 10px;
+  margin-top: 2rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.inventory div {
-  margin-bottom: 10px;
-  padding: 5px;
-  background: #f1f1f1;
+.garden-legend h3 {
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+.garden-legend ul {
+  list-style: none;
+}
+
+.garden-legend li {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  color: #666;
+}
+
+.legend-empty, .legend-planted {
+  width: 30px;
+  height: 30px;
   border-radius: 5px;
-  cursor: grab;
+  margin-right: 1rem;
+  border: 2px solid;
+}
+
+.legend-empty {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.legend-planted {
+  background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+  border-color: #48bb78;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #667eea;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 600;
+  display: inline-block;
+  transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+  background: #edf2f7;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.close-modal {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #999;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+
+.modal-content h2 {
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: #48bb78;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #38a169;
+}
+
+.btn-secondary {
+  background: #edf2f7;
+  color: #667eea;
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .garden-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+  
+  .garden-plot .plot-icon {
+    font-size: 1.5rem;
+  }
+  
+  .garden-plot .plot-name {
+    font-size: 0.75rem;
+  }
 }

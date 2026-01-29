@@ -10,7 +10,7 @@ router.delete('/:id', challengesController.deleteChallengesById);
 router.put( "/:id", challengesController.getChallengeById,challengesController.updateChallengesById
 );
 router.post(
-  '/:id/',
+  '/:id/complete',   // ✅ add "complete" here so it matches frontend
   challengesController.getChallengeById,
   userController.validateUser,
   completionController.createNewRecord,

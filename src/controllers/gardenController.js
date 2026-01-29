@@ -159,3 +159,22 @@ module.exports.sellPlant = (req, res, next) =>
 
     gardenModel.addSellValue(data, callback);
 };
+
+module.exports.getGardenPlots = (req, res, next) => {
+    const gardenModel = require("../models/gardenModel.js");
+    const data = {
+        user_id: req.params.userId
+    };
+
+    const callback = (error, results, fields) => {
+        if (error) {
+            console.error("Error getGardenPlots:", error);
+            return res.status(500).json(error);
+        }
+        else {
+            return res.status(200).json(results);
+        }
+    };
+
+    gardenModel.getAllPlots(data, callback);
+};

@@ -6,20 +6,24 @@ const completionController = require('../controllers/completionController');
 const userController = require('../controllers/userController');
 const gardenController = require('../controllers/gardenController');
 
-router.post("/plant", gardenController.plant);
+// Get all garden plots for a user
+router.get('/:userId', gardenController.getGardenPlots);
+
+// Plant a plant from inventory into a plot
 router.post(
-    "/plant",
-    checkInventory,
-    checkPlot,
-    removeFromInventory,
-    plantIntoPlot
+    '/plant',
+    gardenController.checkInventory,
+    gardenController.checkPlot,
+    gardenController.removeFromInventory,
+    gardenController.plantIntoPlot
 );
 
+// Sell a planted plant
 router.post(
-    "/sell",
-    readPlantedPlot,
-    clearGardenPlot,
-    sellPlant
+    '/sell',
+    gardenController.readPlantedPlot,
+    gardenController.clearGardenPlot,
+    gardenController.sellPlant
 );
 
 module.exports = router;
