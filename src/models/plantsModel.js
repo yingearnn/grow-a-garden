@@ -27,13 +27,13 @@ module.exports.boughtPlant = (data, callback) =>
     VALUES (?,?);
 
     UPDATE User 
-    SET points = points - ? , net_worth = net_worth + ?
+    SET points = points - ? 
     WHERE user_id = ? ;
     `
     
     
     ;
-const VALUES = [data.user_id , data.plant_id, data.points ,data.value, data.user_id];
+const VALUES = [data.user_id , data.plant_id, data.points , data.user_id];
 
 pool.query(SQLSTATEMENT, VALUES, callback);
 }

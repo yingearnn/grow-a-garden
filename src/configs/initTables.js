@@ -10,15 +10,30 @@ bcrypt.hash('1234', saltRounds, (err, hash) => {
   }
 
   const SQLSTATEMENT = `
-DROP TABLE IF EXISTS UserPlants;
 DROP TABLE IF EXISTS UserCompletion;
-DROP TABLE IF EXISTS WellnessChallenge;
-DROP TABLE IF EXISTS User;
-DROP TABLE IF EXISTS Plants;
-DROP TABLE IF EXISTS Tools;
 DROP TABLE IF EXISTS UserTools;
+DROP TABLE IF EXISTS UserPlants;
+DROP TABLE IF EXISTS GardenPlots;
+DROP TABLE IF EXISTS WellnessChallenge;
+DROP TABLE IF EXISTS Tools;
+DROP TABLE IF EXISTS Plants;
+DROP TABLE IF EXISTS User;
 
 
+CREATE TABLE User (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    email TEXT NOT NULL,
+    password TEXT NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    points INT DEFAULT 0,
+    net_worth INT DEFAULT 0
+);
+
+-- Insert initial users with hashed password
+INSERT INTO User (user_id, username, email, password) VALUES
+(1, 'happyPlant', 'happyplant@gmail.com', '${hash}'),
+(2, 'the_sunflowerguy', 'sunny@gmail.com', '${hash}'),
+(3, 'plantMakesMEEhappy', 'MEe@gmail.com', '${hash}');
 
 CREATE TABLE Tools (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -31,12 +46,12 @@ CREATE TABLE Tools (
 );
 
 
-INSERT INTO Tools (item_id,name, multiplier, cost) VALUES
-(1,'Basic Fertiliser', 1.5, 30, 1000),
-(2,'Silver Fertiliser ', 2.0, 60, 2000),
-(3,'Golden Fertiliser ', 3.0, 120, 3000),
-(4,'Diamond Fertiliser ', 4.0, 180, 4000),
-(5,'Jade Fertiliser ', 5.0, 240, 5000);
+INSERT INTO Tools (item_id,name, multiplier, cost, max_stock) VALUES
+(1,'Basic Fertiliser', 1.5, 30, 10),
+(2,'Silver Fertiliser ', 2.0, 60,8),
+(3,'Golden Fertiliser ', 3.0, 120,5),
+(4,'Diamond Fertiliser ', 4.0, 180,2),
+(5,'Jade Fertiliser ', 5.0, 240,1);
 
 CREATE TABLE UserTools (
     user_tool_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -78,21 +93,6 @@ CREATE TABLE GardenPlots (
 
 
 
-CREATE TABLE User (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    email TEXT NOT NULL,
-    password TEXT NOT NULL,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    points INT DEFAULT 0,
-    net_worth INT DEFAULT 0
-);
-
--- Insert initial users with hashed password
-INSERT INTO User (user_id, username, email, password) VALUES
-(1, 'happyPlant', 'happyplant@gmail.com', '${hash}'),
-(2, 'the_sunflowerguy', 'sunny@gmail.com', '${hash}'),
-(3, 'plantMakesMEEhappy', 'MEe@gmail.com', '${hash}');
-
 CREATE TABLE UserPlants (
     user_plant_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -100,9 +100,9 @@ CREATE TABLE UserPlants (
     acquired_on DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO UserPlants (user_id, plant_id, value) VALUES
-(1, 1,100),
-(2, 1,100);
+INSERT INTO UserPlants (user_id, plant_id) VALUES
+(1, 1),
+(2, 1);
 
 
 CREATE TABLE WellnessChallenge (

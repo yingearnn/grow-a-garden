@@ -57,8 +57,7 @@ module.exports.buyPlants = (req, res, next) =>
     const data = {
       user_id: req.body.user_id,
       plant_id: req.plant.plant_id,
-      points:req.plant.points,
-      value: req.plant.value
+      points:req.plant.points
 
     } 
    
