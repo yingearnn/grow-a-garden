@@ -73,7 +73,7 @@ async function loadChallenges() {
         
         // Check current hour for bonus
         const currentHour = new Date().getHours();
-        const isBonus = currentHour >= 6 && currentHour < 8;
+        const isBonus = currentHour >= 10 && currentHour < 12;
         
         challengesList.innerHTML = challenges.map(challenge => {
             const points = isBonus ? Math.floor(challenge.points * 1.5) : challenge.points;
