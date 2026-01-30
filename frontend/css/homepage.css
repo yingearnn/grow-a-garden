@@ -1,242 +1,406 @@
-/* Homepage CSS - Fixed Garden-Centered Layout */
+/* Homepage CSS - Pixel Art Garden Theme */
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Courier New', monospace;
+  background: #87CEEB;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 36px),
+    repeating-linear-gradient(90deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 36px);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Pixelated clouds effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 150px;
+  background: 
+    radial-gradient(ellipse 80px 40px at 20% 50%, rgba(255,255,255,0.8) 0%, transparent 50%),
+    radial-gradient(ellipse 100px 50px at 60% 30%, rgba(255,255,255,0.7) 0%, transparent 50%),
+    radial-gradient(ellipse 90px 45px at 85% 60%, rgba(255,255,255,0.75) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Top Navigation Bar */
 .top-bar {
-  background: white;
+  background: #2C3E50;
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 0 #1a252f;
+  border-bottom: 4px solid #34495E;
+  position: relative;
+  z-index: 10;
 }
 
 .logo h1 {
-  color: #4CAF50;
+  color: #2ECC71;
   font-size: 1.5rem;
+  text-shadow: 2px 2px 0 #27AE60;
+  letter-spacing: 2px;
+  font-weight: bold;
 }
 
 .nav-menu {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .nav-link {
-  color: #333;
+  color: #ECF0F1;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border: 3px solid #34495E;
+  background: #2C3E50;
+  box-shadow: 0 4px 0 #1a252f;
+  transition: all 0.1s ease;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  position: relative;
+  top: 0;
 }
 
 .nav-link:hover {
-  background: #4CAF50;
+  background: #2ECC71;
+  border-color: #27AE60;
   color: white;
+  box-shadow: 0 2px 0 #1e8449;
+  top: 2px;
+}
+
+.nav-link:active {
+  box-shadow: none;
+  top: 4px;
 }
 
 .stats {
   display: flex;
   gap: 1.5rem;
-  font-weight: 600;
-  color: #333;
+  font-weight: bold;
+  color: #ECF0F1;
+  text-shadow: 1px 1px 0 #1a252f;
 }
 
 .btn-logout {
-  background: #f44336;
+  background: #E74C3C;
   color: white;
-  border: none;
-  padding: 0.5rem 1.5rem;
-  border-radius: 5px;
+  border: 3px solid #C0392B;
+  padding: 0.6rem 1.5rem;
+  box-shadow: 0 4px 0 #A93226;
   cursor: pointer;
-  font-weight: 600;
-  transition: background 0.3s ease;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
 }
 
 .btn-logout:hover {
-  background: #d32f2f;
+  background: #C0392B;
+  top: 2px;
+  box-shadow: 0 2px 0 #A93226;
+}
+
+.btn-logout:active {
+  box-shadow: none;
+  top: 4px;
 }
 
 /* Main Garden View */
 .garden-main {
   padding: 2rem;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .garden-container {
-  background: white;
-  border-radius: 15px;
+  background: #F4E4C1;
+  border: 4px solid #8B6F47;
+  box-shadow: 0 8px 0 #6B5736;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
 }
 
 .garden-container h2 {
-  color: #4CAF50;
+  color: #2ECC71;
   margin-bottom: 1rem;
   font-size: 2rem;
+  text-shadow: 2px 2px 0 #27AE60;
+  letter-spacing: 2px;
 }
 
 .garden-stats {
   display: flex;
   gap: 2rem;
   margin-bottom: 1.5rem;
-  font-size: 1.1rem;
-  color: #666;
+  font-size: 1rem;
+  color: #5D4E37;
+  font-weight: bold;
 }
 
 .garden-stats span {
-  font-weight: 700;
-  color: #4CAF50;
+  color: #2ECC71;
+  text-shadow: 1px 1px 0 #27AE60;
 }
 
 /* Garden Grid */
 .garden-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
+  gap: 1.2rem;
   margin-bottom: 2rem;
+  padding: 1rem;
+  background: #D4A574;
+  border: 3px solid #8B6F47;
 }
 
 .garden-plot {
-  aspect-ratio: 1;
-  border: 3px solid #ddd;
-  border-radius: 10px;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+}
+
+.plot-visual {
+  aspect-ratio: 1;
+  border: 4px solid #8B6F47;
+  display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.5rem;
-  transition: all 0.3s ease;
+  transition: all 0.1s ease;
   cursor: pointer;
+  position: relative;
+  top: 0;
+  box-shadow: 0 4px 0 #6B5736;
+  overflow: hidden;
 }
 
-.garden-plot.empty {
-  background: #f5f5f5;
-  border-color: #ccc;
+.plot-visual.empty {
+  background: #8B7355;
+  background-image: 
+    repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(139, 105, 77, 0.3) 5px, rgba(139, 105, 77, 0.3) 10px);
 }
 
-.garden-plot.empty:hover {
-  background: #efefef;
-  border-color: #999;
+.plot-visual.empty:hover {
+  background: #9B8365;
+  top: 2px;
+  box-shadow: 0 2px 0 #6B5736;
 }
 
-.garden-plot.planted {
-  background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
-  border-color: #4CAF50;
+.plot-visual.planted {
+  background: #7CB342;
+  background-image: 
+    repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(104, 159, 56, 0.3) 4px, rgba(104, 159, 56, 0.3) 8px),
+    repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(104, 159, 56, 0.3) 4px, rgba(104, 159, 56, 0.3) 8px);
+  border-color: #558B2F;
+  padding: 0.5rem;
 }
 
-.garden-plot.planted:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+.plot-visual.planted:hover {
+  background: #8BC34A;
+  top: 2px;
+  box-shadow: 0 2px 0 #558B2F;
+}
+
+.plot-visual.planted:active {
+  top: 4px;
+  box-shadow: none;
+}
+
+.plot-info {
+  background: #2C3E50;
+  border: 3px solid #34495E;
+  padding: 0.5rem;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .plot-content {
   text-align: center;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .plot-number {
-  font-size: 0.8rem;
-  color: #999;
+  font-size: 0.75rem;
+  color: #ECF0F1;
   margin-bottom: 0.3rem;
+  font-weight: bold;
 }
 
 .plot-status {
-  color: #999;
-  font-size: 0.9rem;
+  color: #BDC3C7;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.plant-image {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  display: block;
 }
 
 .plant-name {
-  font-weight: 700;
-  color: #2e7d32;
-  margin-bottom: 0.3rem;
-  font-size: 0.9rem;
+  font-weight: bold;
+  color: #2ECC71;
+  margin-bottom: 0.2rem;
+  font-size: 0.75rem;
+  text-shadow: 1px 1px 0 #1e8449;
+  line-height: 1.2;
 }
 
 .plant-value {
-  color: #4CAF50;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  color: #F39C12;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  text-shadow: 1px 1px 0 #E67E22;
+  font-size: 0.8rem;
 }
 
 .btn-harvest {
-  background: #4CAF50;
+  background: #E74C3C;
   color: white;
-  border: none;
-  padding: 0.3rem 0.8rem;
-  border-radius: 5px;
+  border: 2px solid #C0392B;
+  padding: 0.3rem 0.6rem;
+  box-shadow: 0 2px 0 #A93226;
   cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: background 0.3s ease;
+  font-size: 0.65rem;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
+  width: 100%;
 }
 
 .btn-harvest:hover {
-  background: #45a049;
+  background: #C0392B;
+  top: 1px;
+  box-shadow: 0 1px 0 #A93226;
+}
+
+.btn-harvest:active {
+  box-shadow: none;
+  top: 2px;
 }
 
 /* Garden Actions */
 .garden-actions {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
   display: flex;
   gap: 1rem;
-  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .btn-primary, .btn-secondary {
-  padding: 0.8rem 2rem;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 0.8rem 1.5rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
+  transition: all 0.1s ease;
+  border: 4px solid;
   text-decoration: none;
   display: inline-block;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  position: relative;
+  top: 0;
+  box-shadow: 0 4px 0;
 }
 
 .btn-primary {
-  background: #4CAF50;
+  background: #2ECC71;
   color: white;
+  border-color: #27AE60;
+  box-shadow: 0 4px 0 #1e8449;
 }
 
 .btn-primary:hover {
-  background: #45a049;
-  transform: translateY(-2px);
+  background: #27AE60;
+  top: 2px;
+  box-shadow: 0 2px 0 #1e8449;
+}
+
+.btn-primary:active {
+  box-shadow: none;
+  top: 4px;
 }
 
 .btn-secondary {
-  background: #2196F3;
+  background: #3498DB;
   color: white;
+  border-color: #2980B9;
+  box-shadow: 0 4px 0 #1F618D;
 }
 
 .btn-secondary:hover {
-  background: #0b7dda;
-  transform: translateY(-2px);
+  background: #2980B9;
+  top: 2px;
+  box-shadow: 0 2px 0 #1F618D;
+}
+
+.btn-secondary:active {
+  box-shadow: none;
+  top: 4px;
 }
 
 /* Loading State */
 .loading {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: #5D4E37;
   font-size: 1.1rem;
+  font-weight: bold;
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
   .garden-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .garden-actions {
+    position: static;
+    margin-top: 1rem;
+    justify-content: center;
   }
 }
 
@@ -270,6 +434,15 @@ body {
   .stats {
     flex-direction: column;
     gap: 0.5rem;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+  }
+  
+  .garden-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
   }
 }

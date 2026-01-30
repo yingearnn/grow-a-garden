@@ -97,22 +97,36 @@ async function loadGardenPlots() {
             }
 
             const plotDiv = document.createElement('div');
-            plotDiv.className = `garden-plot ${isEmpty ? 'empty' : 'planted'}`;
+            plotDiv.className = 'garden-plot';
             plotDiv.dataset.plotNumber = i;
 
             if (isEmpty) {
                 plotDiv.innerHTML = `
-                    <div class="plot-content">
+                    <div class="plot-visual empty">
+                        <div class="plot-content">
+                            <p class="plot-status">Empty</p>
+                        </div>
+                    </div>
+                    <div class="plot-info">
                         <p class="plot-number">#${i}</p>
-                        <p class="plot-status">Empty</p>
                     </div>
                 `;
             } else {
                 plotDiv.innerHTML = `
-                    <div class="plot-content">
-                        <p class="plot-number">#${i}</p>
-                        <p class="plant-name">${plot.name || 'Unknown'}</p>
-                        <p class="plant-value">$${plot.value || 0}</p>
+                    <div class="plot-visual planted">
+                        <img 
+                            class="plant-image"
+                            src="pixel_plants/${plot.plantImage}"
+                            alt="${plot.name || 'Unknown'}"
+                            onerror="this.onerror=null; this.src='pixel_plants/unknown.png';"
+                        />
+                    </div>
+                    <div class="plot-info">
+                        <div>
+                            <p class="plot-number">#${i}</p>
+                            <p class="plant-name">${plot.name || 'Unknown'}</p>
+                            <p class="plant-value">$${plot.value || 0}</p>
+                        </div>
                         <button class="btn-harvest" data-plot-number="${plot.plot_number}">Harvest</button>
                     </div>
                 `;

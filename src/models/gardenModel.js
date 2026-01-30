@@ -86,7 +86,8 @@ module.exports.getAllPlots = (data, callback) => {
             gp.planted_on,
             gp.value,
             p.name,
-            p.rarity
+            p.rarity,
+            p.plantImage
         FROM GardenPlots gp
         LEFT JOIN UserPlants up ON gp.plant_id = up.user_plant_id
         LEFT JOIN Plants p ON up.plant_id = p.plant_id

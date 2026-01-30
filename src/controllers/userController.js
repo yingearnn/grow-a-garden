@@ -200,7 +200,7 @@ module.exports.login = (req, res, next) => {
                 if(results.length == 0){
                     res.status(404).json({message: "User not found"}); 
                 } else {
-                    res.locals.userId = results[0].id
+                    res.locals.user_id = results[0].user_id
                     res.locals.hash = results[0].password
                     next();
                 }

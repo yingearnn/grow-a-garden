@@ -169,7 +169,7 @@ module.exports.getGardenPlots = (req, res, next) => {
             console.error("Error getGardenPlots:", error);
             return res.status(500).json(error);
         }
-
+          console.log("Garden plots for user", data.user_id, ":", results);
         return res.status(200).json(results);
     };
 
