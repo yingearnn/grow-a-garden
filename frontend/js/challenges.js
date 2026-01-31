@@ -1,5 +1,5 @@
 // js/challenges.js
-
+import { showNotification } from './notifications.js';
 const API_BASE = window.location.origin;
 
 function getToken() {
@@ -61,7 +61,7 @@ async function editChallenge(challengeId) {
 
         if (!response.ok) {
             const error = await response.json();
-            alert(error.message || 'Failed to update challenge');
+            showNotification('Failed to update challenge', 'error');
             return;
         }
 
@@ -71,7 +71,7 @@ async function editChallenge(challengeId) {
 
     } catch (error) {
         console.error('Error editing challenge:', error);
-        alert('Error updating challenge');
+        showNotification('Error updating challenge' ,  'error');
     }
 }
 
@@ -305,28 +305,28 @@ async function createChallenge(event) {
 const UserCurpoints = parseInt(pointsText.replace('Points: ', ''), 10);
 
 if (UserCurpoints < 10) {
-    alert('Insufficient points to create new challenge');
+    showNotification('Insufficient points to create new challenge' , 'error');
     return;
 }
     
     // Validation
     if (!userId) {
-        alert('Please log in to create a challenge');
+        showNotification('Please log in to create a challenge' , 'error');
         return;
     }
     
     if (!description || !points) {
-        alert('Please fill in all fields');
+        showNotification('Please fill in all fields' , 'error');
         return;
     }
     
     if (points > 50) {
-        alert('Maximum 50 points allowed for a challenge');
+        showNotification('Maximum 50 points allowed for a challenge', 'error');
         return;
     }
 
     if (UserCurpoints < 10) {
-        alert('Insufficient points to create new challenge');
+        showNotification('Insufficient points to create new challenge' , 'error');
         return;
     }
     
@@ -358,11 +358,11 @@ if (UserCurpoints < 10) {
         const data = await response.json();
         
         if (!response.ok) {
-            alert(data.message || 'Failed to create challenge');
+            showNotification(data.message || 'Failed to create challenge' , 'error');
             return;
         }
         
-        alert(`Challenge created successfully! "${description}" for ${points} points`);
+        showNotification(`Challenge created successfully! "${description}" for ${points} points` , 'success');
         await loadUserData();
         
         // Clear form
@@ -374,7 +374,7 @@ if (UserCurpoints < 10) {
         
     } catch (error) {
         console.error('Error creating challenge:', error);
-        alert('Error creating challenge. Please try again.');
+        showNotification('Error creating challenge. Please try again.' , 'error');
     }
 }
 
@@ -426,12 +426,12 @@ async function completeChallenge(challengeId) {
         
         if (!response.ok) {
             const error = await response.json();
-            alert(error.message || 'Failed to complete challenge');
+            showNotification(error.message || 'Failed to complete challenge' , 'error');
             return;
         }
         
         const data = await response.json();
-        alert(`Challenge completed! You earned ${data.points_awarded} points!`);
+        showNotification(`Challenge completed! You earned ${data.points_awarded} points!` , 'success');
         
         closeModal();
         await loadUserData();
