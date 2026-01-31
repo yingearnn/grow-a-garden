@@ -131,6 +131,7 @@ function closeModal() {
 async function plantInGarden(userPlantId, plotNumber) {
     const token = getToken();
     const userId = getUserId();
+
     
     if (plotNumber < 1 || plotNumber > 20) {
         showNotification('Plot number must be between 1 and 20' , 'error');
@@ -158,7 +159,7 @@ async function plantInGarden(userPlantId, plotNumber) {
         
         if (!response.ok) {
             const error = await response.json();
-            showNotification(error.message || 'Failed to plant' , 'error');
+             showNotification(error.message || 'Failed to plant', 'error');
             return;
         }
         

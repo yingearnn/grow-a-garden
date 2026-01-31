@@ -4,12 +4,13 @@
   top: 1rem;
   right: 1rem;
   z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  /* Removed flex properties to allow overlap */
 }
 
 .notification {
+  position: absolute; /* Added for overlap */
+  top: 0; /* Added for overlap */
+  right: 0; /* Added for overlap */
   background: #2ECC71; /* green for success */
   color: white;
   border: 3px solid #27AE60;
@@ -21,6 +22,8 @@
   animation: slideIn 0.3s ease forwards, fadeOut 0.3s ease forwards 2.7s;
   opacity: 0;
   transform: translateX(100%);
+  min-width: 350px; /* Made wider */
+  max-width: 500px; /* Added max width */
 }
 
 .notification.error {
