@@ -4,10 +4,10 @@ const router = express.Router();
 const challengesController = require('../controllers/challengesController');
 const completionController = require('../controllers/completionController');
 const userController = require('../controllers/userController');
-router.post('/', challengesController.createNewChallenge);
+router.post('/', challengesController.readLatestChallenge , challengesController.createNewChallenge);
 router.get('/', challengesController.readAllChallenges);
 router.delete('/:id', challengesController.deleteChallengesById);
-router.put( "/:id", challengesController.getChallengeById,challengesController.updateChallengesById
+router.put( "/:id", challengesController.getChallengeById,userController.validateUser,challengesController.updateChallengesById
 );
 router.post(
   '/:id/complete',   // ✅ add "complete" here so it matches frontend

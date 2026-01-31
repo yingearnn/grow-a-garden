@@ -25,8 +25,74 @@
       <p class="cooldown-info">⏰ Each challenge can be completed once every 24 hours</p>
     </div>
 
-    <div id="challenges-list" class="challenges-list">
-      <div class="loading">Loading challenges...</div>
+    <!-- Challenge Tabs -->
+    <div class="challenge-tabs">
+      <button class="tab-btn active" data-tab="available">Available Challenges</button>
+      <button class="tab-btn" data-tab="completed">My Completed Challenges</button>
+      <button class="tab-btn" data-tab="create">Create Challenge</button>
+    </div>
+
+    <!-- Available Challenges Tab -->
+    <div id="available-tab" class="tab-content active">
+      <div id="challenges-list" class="challenges-list">
+        <div class="loading">Loading challenges...</div>
+      </div>
+    </div>
+
+    <!-- Completed Challenges Tab -->
+    <div id="completed-tab" class="tab-content">
+      <div id="completed-list" class="completed-list">
+        <div class="loading">Loading completed challenges...</div>
+      </div>
+    </div>
+
+    <!--Edit Challenge Tab-->
+    <div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-edit-modal">&times;</span>
+        <h2>Edit Challenge</h2>
+        <form id="edit-form">
+            <label for="edit-description">Description:</label>
+            <input type="text" id="edit-description" required maxlength="200">
+
+            <label for="edit-points">Points:</label>
+            <input type="number" id="edit-points" required min="1" max="50">
+
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+
+    <!-- Create Challenge Tab -->
+    <div id="create-tab" class="tab-content">
+      <div class="create-challenge-form">
+        <h2>Create New Challenge</h2>
+        <form id="create-challenge-form">
+          <div class="form-group">
+            <label for="challenge-description">Challenge Description:</label>
+            <input 
+              type="text" 
+              id="challenge-description" 
+              required 
+              placeholder="e.g., Drink 8 glasses of water"
+              maxlength="200"
+            />
+          </div>
+          <div class="form-group">
+            <label for="challenge-points">Points (max 50):</label>
+            <input 
+              type="number" 
+              id="challenge-points" 
+              required 
+              min="1" 
+              max="50"
+              placeholder="10"
+            />
+          </div>
+          <button type="submit" class="btn-primary">Create Challenge</button>
+        </form>
+      </div>
     </div>
 
     <div class="back-link">
@@ -48,6 +114,18 @@
       </form>
     </div>
   </div>
+
+  <!-- View Completion Details Modal -->
+  <div id="details-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-details-modal">&times;</span>
+      <h2>Completion Details</h2>
+      <div id="completion-details-content">
+        <!-- Details will be populated here -->
+      </div>
+    </div>
+  </div>
+
  <script src="js/queryCmds.js"></script>
 <script src="js/getCurrentURL.js"></script>
   <script src="js/challenges.js"></script>

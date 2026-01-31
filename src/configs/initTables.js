@@ -151,6 +151,7 @@ CREATE TABLE WellnessChallenge (
     creator_id INT NOT NULL,
     description TEXT NOT NULL,
     points INT NOT NULL,
+    created_on DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (creator_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
 

@@ -6,28 +6,46 @@ module.exports.createNewChallenge = (req, res, next) =>
 
 {
     
-    if(req.body.user_id == undefined || req.body.description == undefined || req.body.points == undefined)
+    if(req.user_id == undefined || req.body.description == undefined || req.body.points == undefined)
     {
        return res.status(400).json({message: "User_id or description or points is undefined"});
         
     }                                                      
 
     const data = {
-      user_id: req.body.user_id,
+      user_id: req.user_id,
       description: req.body.description,
       points: req.body.points
     }
+      
+    
+     if(data.points > 50){
+             return res.status(403).json({
+                message: "Maximum 50 points for challenge"
+             });
+           }
+
+           
+            const lastCreated = new Date(req.latestChallengeTime );
+            const now = new Date();
+            // 24-hour cooldown check
+            if (now - lastCreated < 1 * 60 * 60 * 1000) {
+                return res.status(400).json({
+                    message: "You can only create a new challenge once every 24 hours"
+                });
+            }
+        
 
     const callback = (error, results, fields) => {
-        if (error) {
 
+        if (error) {
             console.error("Error createNewChallenge:", error);
            return res.status(500).json(error);
         } 
          // Successfully created challenge, returns it with info
         else {
             return res.status(201).json({
-                challenge_id: results.insertId,
+                challenge_id: results[0].insertId,
                description: data.description,
                creator_id : data.user_id,
                 points: data.points
@@ -53,6 +71,38 @@ module.exports.readAllChallenges = (req, res, next) =>
 
     challengesModel.selectAll(callback);
 }
+
+module.exports.readLatestChallenge = (req, res, next) =>
+
+{
+    const data = {
+      user_id: req.body.user_id
+    }
+
+    const callback = (error, results, fields) => {
+        if (error) {
+            console.error("Error readAllChallenges:", error);
+          return res.status(500).json(error);
+        } 
+           
+               if (results.length > 0) {
+              req.latestChallengeTime = results[1].created_on
+              req.user_id = data.user_id
+              return next();
+               }
+
+               else{
+                req.user_id = data.user_id
+                return next();
+               }
+        
+    }
+
+             challengesModel.selectLatest(data, callback);
+    }
+
+
+
 // Deletes a challenge by ID
 module.exports.deleteChallengesById = (req, res, next) => {
     const data = {
