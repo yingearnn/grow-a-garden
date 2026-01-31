@@ -239,6 +239,68 @@ body {
   opacity: 0.6;
 }
 
+/* Creator Actions */
+.creator-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-edit {
+  flex: 1;
+  background: #F39C12;
+  color: white;
+  border: 3px solid #E67E22;
+  padding: 0.7rem 1.5rem;
+  box-shadow: 0 4px 0 #D35400;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
+}
+
+.btn-edit:hover {
+  background: #E67E22;
+  top: 2px;
+  box-shadow: 0 2px 0 #D35400;
+}
+
+.btn-edit:active {
+  box-shadow: none;
+  top: 4px;
+}
+
+.btn-delete {
+  flex: 1;
+  background: #E74C3C;
+  color: white;
+  border: 3px solid #C0392B;
+  padding: 0.7rem 1.5rem;
+  box-shadow: 0 4px 0 #A93226;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
+}
+
+.btn-delete:hover {
+  background: #C0392B;
+  top: 2px;
+  box-shadow: 0 2px 0 #A93226;
+}
+
+.btn-delete:active {
+  box-shadow: none;
+  top: 4px;
+}
+
 /* Completed Challenges */
 .completed-list {
   display: grid;
@@ -615,28 +677,4 @@ body {
   .btn-view-details {
     width: 100%;
   }
-}
-
-.btn-edit {
-  font-family: 'Press Start 2P', cursive; /* pixel font */
-  text-transform: uppercase;
-  border: 2px solid #ffab00; /* orange border */
-  background-color: #ffc107; /* yellow-orange fill */
-  color: #212121; /* dark text */
-  padding: 6px 12px;
-  cursor: pointer;
-  outline: none;
-  box-shadow: 3px 3px 0px #ff6f00; /* chunky pixel shadow */
-  transition: all 0.1s ease-in-out;
-}
-
-.btn-edit:hover {
-  background-color: #ffb300;
-  box-shadow: 2px 2px 0px #e65100;
-  transform: translateY(-1px);
-}
-
-.btn-edit:active {
-  box-shadow: inset 2px 2px 0px #e65100;
-  transform: translateY(1px);
 }

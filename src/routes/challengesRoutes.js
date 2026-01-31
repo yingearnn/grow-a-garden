@@ -6,7 +6,7 @@ const completionController = require('../controllers/completionController');
 const userController = require('../controllers/userController');
 router.post('/', challengesController.readLatestChallenge , challengesController.createNewChallenge);
 router.get('/', challengesController.readAllChallenges);
-router.delete('/:id', challengesController.deleteChallengesById);
+router.delete('/:id', challengesController.getChallengeById,userController.validateUser,challengesController.deleteChallengesById);
 router.put( "/:id", challengesController.getChallengeById,userController.validateUser,challengesController.updateChallengesById
 );
 router.post(

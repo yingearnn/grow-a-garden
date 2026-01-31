@@ -106,7 +106,15 @@ module.exports.readLatestChallenge = (req, res, next) =>
 // Deletes a challenge by ID
 module.exports.deleteChallengesById = (req, res, next) => {
     const data = {
-        id: req.params.id
+        id: req.challenge.challenge_id,
+        userid:req.user.user_id
+    }
+
+     if (req.challenge.creator_id != req.user.user_id) {
+         return res.status(403).json({
+            message: "You are not the creator of this challenge"
+        });
+        
     }
 
     const callback = (error, results, fields) => {
@@ -116,13 +124,6 @@ module.exports.deleteChallengesById = (req, res, next) => {
         } else {
             const userCompletionResult = results[0]; // first DELETE
             const challengeResult = results[1]; // second DELETE
-            if(challengeResult.affectedRows === 0) 
-            {
-               return res.status(404).json({
-                    message: "Challenge not found"
-                });
-            }
-            else
                  // Successfully deleted, no content returned
                 return res.status(204).send();            
         }

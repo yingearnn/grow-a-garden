@@ -48,11 +48,15 @@ pool.query(SQLSTATMENT,VALUES, callback);
 module.exports.deleteChallengesById = (data, callback) =>
 {
     const SQLSTATEMENT = `
+    DELETE FROM UserCompletion
+    WHERE challenge_id = ?
+    ;
+
     DELETE FROM WellnessChallenge 
     WHERE challenge_id = ?
     ;
     `;
-const VALUES = [data.id];
+const VALUES = [data.id,data.id];
 
 pool.query(SQLSTATEMENT, VALUES, callback);
 }

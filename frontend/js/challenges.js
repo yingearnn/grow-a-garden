@@ -47,7 +47,7 @@ async function editChallenge(challengeId) {
 
     try {
         const response = await fetch(`${API_BASE}/challenges/${challengeId}`, {
-            method: 'PUT', // matches your backend
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -61,20 +61,54 @@ async function editChallenge(challengeId) {
 
         if (!response.ok) {
             const error = await response.json();
-            showNotification('Failed to update challenge', 'error');
+            showNotification(error.message || 'Failed to update challenge', 'error');
             return;
         }
 
-        showNotification('Challenge updated successfully!' , 'success');
+        showNotification('Challenge updated successfully!', 'success');
         document.getElementById('edit-modal').classList.remove('active');
-        await loadChallenges(); // refresh list
+        await loadChallenges();
 
     } catch (error) {
         console.error('Error editing challenge:', error);
-        showNotification('Error updating challenge' ,  'error');
+        showNotification('Error updating challenge', 'error');
     }
 }
 
+async function deleteChallenge(challengeId, description) {
+    if (!confirm(`Are you sure you want to delete "${description}"?`)) {
+        return;
+    }
+
+    const token = getToken();
+
+    try {
+        const response = await fetch(`${API_BASE}/challenges/${challengeId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.status === 401) {
+            logout();
+            return;
+        }
+
+        if (!response.ok) {
+            const error = await response.json();
+            showNotification(error.message || 'Failed to delete challenge', 'error');
+            return;
+        }
+
+        showNotification('Challenge deleted successfully!', 'success');
+        await loadChallenges();
+
+    } catch (error) {
+        console.error('Error deleting challenge:', error);
+        showNotification('Error deleting challenge', 'error');
+    }
+}
 
 async function loadUserData() {
     const token = getToken();
@@ -128,55 +162,73 @@ async function loadChallenges() {
         const currentHour = new Date().getHours();
         const isBonus = currentHour >= 10 && currentHour < 12;
         
-       const userId = getUserId(); // logged-in user
+        const userId = getUserId();
 
-challengesList.innerHTML = challenges.map(challenge => {
-    const points = isBonus ? Math.floor(challenge.points * 1.5) : challenge.points;
-    const isCreator = parseInt(challenge.creator_id) === parseInt(userId);
+        challengesList.innerHTML = challenges.map(challenge => {
+            const points = isBonus ? Math.floor(challenge.points * 1.5) : challenge.points;
+            const isCreator = parseInt(challenge.creator_id) === parseInt(userId);
 
-    return `
-        <div class="challenge-card">
-            <h3>${challenge.description}</h3>
-            <p class="challenge-points">
-                ${points} points ${isBonus ? '(1.5x BONUS!)' : ''}
-            </p>
-            <button class="btn-complete" 
-                data-challenge-id="${challenge.challenge_id}" 
-                data-points="${points}" 
-                data-description="${challenge.description}">
-                Complete Challenge
-            </button>
-            ${isCreator ? `<button class="btn-edit" 
-                data-challenge-id="${challenge.challenge_id}" 
-                data-description="${challenge.description}" 
-                data-points="${challenge.points}">
-                Edit
-            </button>` : ''}
-        </div>
-    `;
-}).join('');
+            return `
+                <div class="challenge-card">
+                    <h3>${challenge.description}</h3>
+                    <p class="challenge-points">
+                        ${points} points ${isBonus ? '(1.5x BONUS!)' : ''}
+                    </p>
+                    <button class="btn-complete" 
+                        data-challenge-id="${challenge.challenge_id}" 
+                        data-points="${points}" 
+                        data-description="${challenge.description}">
+                        Complete Challenge
+                    </button>
+                    ${isCreator ? `
+                        <div class="creator-actions">
+                            <button class="btn-edit" 
+                                data-challenge-id="${challenge.challenge_id}" 
+                                data-description="${challenge.description}" 
+                                data-points="${challenge.points}">
+                                Edit
+                            </button>
+                            <button class="btn-delete" 
+                                data-challenge-id="${challenge.challenge_id}"
+                                data-description="${challenge.description}">
+                                Delete
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+        
         // Add event listeners
-    document.querySelector('.close-edit-modal').addEventListener('click', () => {
-    document.getElementById('edit-modal').classList.remove('active');
-});
+        document.querySelector('.close-edit-modal').addEventListener('click', () => {
+            document.getElementById('edit-modal').classList.remove('active');
+        });
 
-     document.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const challengeId = e.currentTarget.dataset.challengeId;
-        const description = e.currentTarget.dataset.description;
-        const points = e.currentTarget.dataset.points;
-        openEditModal(challengeId, description, points);
-    });
-});
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const challengeId = e.currentTarget.dataset.challengeId;
+                const description = e.currentTarget.dataset.description;
+                const points = e.currentTarget.dataset.points;
+                openEditModal(challengeId, description, points);
+            });
+        });
 
-       document.querySelectorAll('.btn-complete').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const challengeId = e.currentTarget.dataset.challengeId;
-        const points = e.currentTarget.dataset.points;
-        const description = e.currentTarget.dataset.description;
-        openCompletionModal(challengeId, points, description);
-    });
-});
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const challengeId = e.currentTarget.dataset.challengeId;
+                const description = e.currentTarget.dataset.description;
+                deleteChallenge(challengeId, description);
+            });
+        });
+
+        document.querySelectorAll('.btn-complete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const challengeId = e.currentTarget.dataset.challengeId;
+                const points = e.currentTarget.dataset.points;
+                const description = e.currentTarget.dataset.description;
+                openCompletionModal(challengeId, points, description);
+            });
+        });
     } catch (error) {
         console.error('Error loading challenges:', error);
         document.getElementById('challenges-list').innerHTML = '<p>Error loading challenges</p>';
@@ -188,7 +240,6 @@ async function loadCompletedChallenges() {
     const userId = getUserId();
     
     try {
-        // We need to get all challenges first, then check which ones the user has completed
         const challengesResponse = await fetch(`${API_BASE}/challenges`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -201,7 +252,6 @@ async function loadCompletedChallenges() {
         const completedList = document.getElementById('completed-list');
         const completedChallenges = [];
         
-        // Check each challenge for user completions
         for (const challenge of challenges) {
             try {
                 const completionResponse = await fetch(`${API_BASE}/challenges/${challenge.challenge_id}/`, {
@@ -232,7 +282,6 @@ async function loadCompletedChallenges() {
             return;
         }
         
-        // Sort by most recent first
         completedChallenges.sort((a, b) => new Date(b.completed_on) - new Date(a.completed_on));
         
         completedList.innerHTML = completedChallenges.map(challenge => {
@@ -261,7 +310,6 @@ async function loadCompletedChallenges() {
             `;
         }).join('');
         
-        // Add event listeners for view details buttons
         document.querySelectorAll('.btn-view-details').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const details = decodeURIComponent(e.currentTarget.dataset.details);
@@ -301,22 +349,21 @@ async function createChallenge(event) {
     const userId = getUserId();
     const description = document.getElementById('challenge-description').value;
     const points = parseInt(document.getElementById('challenge-points').value);
- const pointsText = document.getElementById('points-display').textContent; // "Points: 25"
-const UserCurpoints = parseInt(pointsText.replace('Points: ', ''), 10);
+    const pointsText = document.getElementById('points-display').textContent;
+    const UserCurpoints = parseInt(pointsText.replace('Points: ', ''), 10);
 
-if (UserCurpoints < 10) {
-    showNotification('Insufficient points to create new challenge' , 'error');
-    return;
-}
+    if (UserCurpoints < 10) {
+        showNotification('Insufficient points to create new challenge', 'error');
+        return;
+    }
     
-    // Validation
     if (!userId) {
-        showNotification('Please log in to create a challenge' , 'error');
+        showNotification('Please log in to create a challenge', 'error');
         return;
     }
     
     if (!description || !points) {
-        showNotification('Please fill in all fields' , 'error');
+        showNotification('Please fill in all fields', 'error');
         return;
     }
     
@@ -324,17 +371,6 @@ if (UserCurpoints < 10) {
         showNotification('Maximum 50 points allowed for a challenge', 'error');
         return;
     }
-
-    if (UserCurpoints < 10) {
-        showNotification('Insufficient points to create new challenge' , 'error');
-        return;
-    }
-    
-    console.log('Creating challenge with:', {
-        user_id: parseInt(userId),
-        description: description,
-        points: points
-    });
     
     try {
         const response = await fetch(`${API_BASE}/challenges`, {
@@ -358,23 +394,21 @@ if (UserCurpoints < 10) {
         const data = await response.json();
         
         if (!response.ok) {
-            showNotification(data.message || 'Failed to create challenge' , 'error');
+            showNotification(data.message || 'Failed to create challenge', 'error');
             return;
         }
         
-        showNotification(`Challenge created successfully! "${description}" for ${points} points` , 'success');
+        showNotification(`Challenge created successfully! "${description}" for ${points} points`, 'success');
         await loadUserData();
         
-        // Clear form
         document.getElementById('create-challenge-form').reset();
         
-        // Switch to available challenges tab and reload
         switchTab('available');
         await loadChallenges();
         
     } catch (error) {
         console.error('Error creating challenge:', error);
-        showNotification('Error creating challenge. Please try again.' , 'error');
+        showNotification('Error creating challenge. Please try again.', 'error');
     }
 }
 
@@ -426,32 +460,29 @@ async function completeChallenge(challengeId) {
         
         if (!response.ok) {
             const error = await response.json();
-            showNotification(error.message || 'Failed to complete challenge' , 'error');
+            showNotification(error.message || 'Failed to complete challenge', 'error');
             return;
         }
         
         const data = await response.json();
-        showNotification(`Challenge completed! You earned ${data.points_awarded} points!` , 'success');
+        showNotification(`Challenge completed! You earned ${data.points_awarded} points!`, 'success');
         
         closeModal();
         await loadUserData();
-        await loadCompletedChallenges(); // Refresh completed challenges
+        await loadCompletedChallenges();
     } catch (error) {
         console.error('Error completing challenge:', error);
-        alert('Error completing challenge');
+        showNotification('Error completing challenge', 'error');
     }
 }
 
 function switchTab(tabName) {
-    // Remove active class from all tabs and content
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
-    // Add active class to selected tab and content
     document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
     document.getElementById(`${tabName}-tab`).classList.add('active');
     
-    // Load content for the tab if needed
     if (tabName === 'completed') {
         loadCompletedChallenges();
     } else if (tabName === 'available') {
@@ -466,7 +497,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('logout-btn').addEventListener('click', logout);
     
-    // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const tabName = e.currentTarget.dataset.tab;
@@ -474,10 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Create challenge form
     document.getElementById('create-challenge-form').addEventListener('submit', createChallenge);
     
-    // Modal close handlers
     document.querySelector('.close-modal').addEventListener('click', closeModal);
     document.querySelector('.close-details-modal').addEventListener('click', closeDetailsModal);
     
