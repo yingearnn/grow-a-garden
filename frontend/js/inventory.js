@@ -163,7 +163,7 @@ async function plantInGarden(userPlantId, plotNumber) {
         }
         
         const data = await response.json();
-        showNotification(`Plant planted successfully in plot ${plotNumber}!` , 'error');
+        showNotification(`Plant planted successfully in plot ${plotNumber}!` , 'success');
         
         closeModal();
         await loadInventory();

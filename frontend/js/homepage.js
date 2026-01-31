@@ -113,12 +113,12 @@ async function loadGardenPlots() {
             } else {
                 plotDiv.innerHTML = `
                     <div class="plot-visual planted">
-                        <img 
-                            class="plant-image"
-                            src="pixel_plants/${plot.plantImage}"
-                            alt="${plot.name || 'Unknown'}"
-                            onerror="this.onerror=null; this.src='pixel_plants/unknown.png';"
-                        />
+                     <img
+  class="plant-image"
+ src="pixel_plants/${plot.plantImage}"
+  alt="${plot.name || 'Unknown'}"
+  onerror="this.onerror=null; this.src='frontend/pixel_plants/unknown.png';"
+/>
                     </div>
                     <div class="plot-info">
                         <div>

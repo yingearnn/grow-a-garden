@@ -77,26 +77,27 @@ CREATE TABLE Plants (
 );
 
 INSERT INTO Plants (plant_id, name, rarity, points, value, stock, max_stock,plantImage) VALUES
-(1, 'Sunflower', 'common', 10, 100, 10, 10,'frontend\pixel_plants\sunflower.png'),
-(2, 'Tulip', 'common', 15, 150, 10, 10,'frontend\pixel_plants\tulip.png'),
-(3, 'Rose', 'rare', 30, 400, 5, 5,'frontend\pixel_plants\rose.png'),
-(4, 'Orchid', 'special', 50, 800, 3, 3,'frontend\pixel_plants\orchid.png'),
-(5, 'Bonsai', 'legendary', 100, 2000, 1, 1,'frontend\pixel_plants\bonsai.png'),
-(6, 'Cactus', 'common', 12, 120, 10, 10,'frontend\pixel_plants\cactus.png'),
-(7, 'Lavender', 'rare', 35, 500, 5, 5,'frontend\pixel_plants\lavender.png'),
-(8, 'Venus Flytrap', 'special', 60, 1000, 3, 3,'frontend\pixel_plants\venus_flytrap.png'),
-(9, 'Cherry Blossom', 'legendary', 120, 3000, 1, 1,'frontend\pixel_plants\cherry_blossom.png'),
-(10, 'Daisy', 'common', 8, 80, 10, 10,'frontend\pixel_plants\daisy.png'),
-(11, 'Mint', 'common', 11, 110, 10, 10,'frontend\pixel_plants\mint.png'),
-(12, 'Aloe Vera', 'rare', 28, 380, 5, 5,'frontend\pixel_plants\aloe_vera.png'),
-(13, 'Peony', 'rare', 40, 550, 5, 5,'frontend\pixel_plants\peony.png'),
-(14, 'Pitcher Plant', 'special', 55, 900, 3, 3,'frontend\pixel_plants\pitcher_plant.png'),
-(15, 'Blue Rose', 'special', 70, 1200, 3, 3,'frontend\pixel_plants\blue_rose.png'),
-(16, 'Golden Bamboo', 'legendary', 150, 4000, 1, 1,'frontend\pixel_plants\golden_bamboo.png'),
-(17, 'Moon Orchid', 'legendary', 180, 5000, 1, 1,'frontend\pixel_plants\moon_orchid.png'),
-(18, 'Fern', 'common', 9, 90, 10, 10,'frontend\pixel_plants\fern.png'),
-(19, 'Jade Plant', 'rare', 32, 450, 5, 5,'frontend\pixel_plants\jade_plant.png'),
-(20, 'Lotus', 'special', 65, 1100, 3, 3,'frontend\pixel_plants\lotus.png');
+(1, 'Sunflower', 'common', 10, 100, 10, 10,'frontendpixel_plantssunflower.png'),
+(2, 'Tulip', 'common', 15, 150, 10, 10,'frontendpixel_plantstulip.png'),
+(3, 'Rose', 'rare', 30, 400, 5, 5,'frontendpixel_plantsrose.png'),
+(4, 'Orchid', 'special', 50, 800, 3, 3,'frontendpixel_plantsorchid.png'),
+(5, 'Bonsai', 'legendary', 100, 2000, 1, 1,'frontendpixel_plantsbonsai.png'),
+(6, 'Cactus', 'common', 12, 120, 10, 10,'frontendpixel_plantscactus.png'),
+(7, 'Lavender', 'rare', 35, 500, 5, 5,'frontendpixel_plantslavender.png'),
+(8, 'Venus Flytrap', 'special', 60, 1000, 3, 3,'frontendpixel_plantsvenus_flytrap.png'),
+(9, 'Cherry Blossom', 'legendary', 120, 3000, 1, 1,'frontendpixel_plantscherry_blossom.png'),
+(10, 'Daisy', 'common', 8, 80, 10, 10,'frontendpixel_plantsdaisy.png'),
+(11, 'Mint', 'common', 11, 110, 10, 10,'frontendpixel_plantsmint.png'),
+(12, 'Aloe Vera', 'rare', 28, 380, 5, 5,'frontendpixel_plantsaloe_vera.png'),
+(13, 'Peony', 'rare', 40, 550, 5, 5,'frontendpixel_plantspeony.png'),
+(14, 'Pitcher Plant', 'special', 55, 900, 3, 3,'frontendpixel_plantspitcher_plant.png'),
+(15, 'Blue Rose', 'special', 70, 1200, 3, 3,'frontendpixel_plantsblue_rose.png'),
+(16, 'Golden Bamboo', 'legendary', 150, 4000, 1, 1,'frontendpixel_plantsgolden_bamboo.png'),
+(17, 'Moon Orchid', 'legendary', 180, 5000, 1, 1,'frontendpixel_plantsmoon_orchid.png'),
+(18, 'Fern', 'common', 9, 90, 10, 10,'frontendpixel_plantsfern.png'),
+(19, 'Jade Plant', 'rare', 32, 450, 5, 5,'frontendpixel_plantsjade_plant.png'),
+(20, 'Lotus', 'special', 65, 1100, 3, 3,'frontendpixel_plantslotus.png');
+
 
 -- USER PLANTS
 CREATE TABLE UserPlants (
