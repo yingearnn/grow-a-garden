@@ -23,6 +23,59 @@ function logout() {
     window.location.href = 'login.html';
 }
 
+function openEditModal(challengeId, description, points) {
+    const modal = document.getElementById('edit-modal');
+    document.getElementById('edit-description').value = description;
+    document.getElementById('edit-points').value = points;
+    modal.classList.add('active');
+
+    const oldForm = document.getElementById('edit-form');
+    const newForm = oldForm.cloneNode(true);
+    oldForm.parentNode.replaceChild(newForm, oldForm);
+
+    newForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await editChallenge(challengeId);
+    });
+}
+
+async function editChallenge(challengeId) {
+    const token = getToken();
+    const userId = getUserId();
+    const description = document.getElementById('edit-description').value;
+    const points = parseInt(document.getElementById('edit-points').value);
+
+    try {
+        const response = await fetch(`${API_BASE}/challenges/${challengeId}`, {
+            method: 'PUT', // matches your backend
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ 
+                user_id: parseInt(userId),
+                description,
+                points
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            alert(error.message || 'Failed to update challenge');
+            return;
+        }
+
+        alert('Challenge updated successfully!');
+        document.getElementById('edit-modal').classList.remove('active');
+        await loadChallenges(); // refresh list
+
+    } catch (error) {
+        console.error('Error editing challenge:', error);
+        alert('Error updating challenge');
+    }
+}
+
+
 async function loadUserData() {
     const token = getToken();
     const userId = getUserId();
@@ -75,22 +128,47 @@ async function loadChallenges() {
         const currentHour = new Date().getHours();
         const isBonus = currentHour >= 10 && currentHour < 12;
         
-        challengesList.innerHTML = challenges.map(challenge => {
-            const points = isBonus ? Math.floor(challenge.points * 1.5) : challenge.points;
-            return `
-                <div class="challenge-card">
-                    <h3>${challenge.description}</h3>
-                    <p class="challenge-points">
-                        ${points} points ${isBonus ? '(1.5x BONUS!)' : ''}
-                    </p>
-                    <button class="btn-complete" data-challenge-id="${challenge.challenge_id}" data-points="${points}" data-description="${challenge.description}">
-                        Complete Challenge
-                    </button>
-                </div>
-            `;
-        }).join('');
-        
+       const userId = getUserId(); // logged-in user
+
+challengesList.innerHTML = challenges.map(challenge => {
+    const points = isBonus ? Math.floor(challenge.points * 1.5) : challenge.points;
+    const isCreator = parseInt(challenge.creator_id) === parseInt(userId);
+
+    return `
+        <div class="challenge-card">
+            <h3>${challenge.description}</h3>
+            <p class="challenge-points">
+                ${points} points ${isBonus ? '(1.5x BONUS!)' : ''}
+            </p>
+            <button class="btn-complete" 
+                data-challenge-id="${challenge.challenge_id}" 
+                data-points="${points}" 
+                data-description="${challenge.description}">
+                Complete Challenge
+            </button>
+            ${isCreator ? `<button class="btn-edit" 
+                data-challenge-id="${challenge.challenge_id}" 
+                data-description="${challenge.description}" 
+                data-points="${challenge.points}">
+                Edit
+            </button>` : ''}
+        </div>
+    `;
+}).join('');
         // Add event listeners
+    document.querySelector('.close-edit-modal').addEventListener('click', () => {
+    document.getElementById('edit-modal').classList.remove('active');
+});
+
+     document.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const challengeId = e.currentTarget.dataset.challengeId;
+        const description = e.currentTarget.dataset.description;
+        const points = e.currentTarget.dataset.points;
+        openEditModal(challengeId, description, points);
+    });
+});
+
        document.querySelectorAll('.btn-complete').forEach(btn => {
     btn.addEventListener('click', (e) => {
         const challengeId = e.currentTarget.dataset.challengeId;

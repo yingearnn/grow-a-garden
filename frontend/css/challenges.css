@@ -616,3 +616,27 @@ body {
     width: 100%;
   }
 }
+
+.btn-edit {
+  font-family: 'Press Start 2P', cursive; /* pixel font */
+  text-transform: uppercase;
+  border: 2px solid #ffab00; /* orange border */
+  background-color: #ffc107; /* yellow-orange fill */
+  color: #212121; /* dark text */
+  padding: 6px 12px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 3px 3px 0px #ff6f00; /* chunky pixel shadow */
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-edit:hover {
+  background-color: #ffb300;
+  box-shadow: 2px 2px 0px #e65100;
+  transform: translateY(-1px);
+}
+
+.btn-edit:active {
+  box-shadow: inset 2px 2px 0px #e65100;
+  transform: translateY(1px);
+}

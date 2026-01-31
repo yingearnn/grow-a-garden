@@ -1,4 +1,7 @@
-// Don't redeclare currentUrl - it's already declared in getCurrentURL.js
+// ---------------- Notifications ----------------
+import { showNotification } from './notifications.js';
+
+const API_BASE = window.location.origin;
 
 // ---------------- Auth Helpers ----------------
 function getToken() {
@@ -22,25 +25,27 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-// ---------------- Load User Data ----------------
+
+
+// ---------------- User Data ----------------
 async function loadUserData() {
     const token = getToken();
     const userId = getUserId();
 
     try {
-        const response = await fetch(`${currentUrl}/user/${userId}`, {
+        const res = await fetch(`${API_BASE}/user/${userId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (response.status === 401) {
-            alert('Session expired. Please login again.');
+        if (res.status === 401) {
+            showNotification('Session expired. Please login again.', 'error');
             logout();
             return;
         }
 
-        if (!response.ok) throw new Error('Failed to fetch user data');
+        if (!res.ok) throw new Error('Failed to fetch user data');
 
-        const data = await response.json();
+        const data = await res.json();
         const user = data[0];
 
         document.getElementById('username-display').textContent = user.username;
@@ -48,13 +53,13 @@ async function loadUserData() {
         document.getElementById('networth-display').textContent = `Net Worth: $${user.net_worth}`;
 
         return user;
-    } catch (error) {
-        console.error('Error loading user data:', error);
-        alert('Error loading user data: ' + error.message);
+    } catch (err) {
+        console.error(err);
+        showNotification('Error loading user data', 'error');
     }
 }
 
-// ---------------- Load Garden Plots ----------------
+// ---------------- Garden Plots ----------------
 async function loadGardenPlots() {
     const token = getToken();
     const userId = getUserId();
@@ -63,30 +68,24 @@ async function loadGardenPlots() {
     gardenPlotsDiv.innerHTML = '<div class="loading">Loading garden...</div>';
 
     try {
-        // FIXED: Use correct endpoint /garden/:userId
-        const response = await fetch(`${currentUrl}/garden/${userId}`, {
+        const res = await fetch(`${API_BASE}/garden/${userId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (response.status === 401) {
-            alert('Session expired. Please login again.');
+        if (res.status === 401) {
+            showNotification('Session expired. Please login again.', 'error');
             logout();
             return;
         }
 
-        if (!response.ok) {
-            console.error('Garden fetch failed:', response.status, response.statusText);
-            throw new Error('Failed to fetch garden plots');
-        }
+        if (!res.ok) throw new Error('Failed to fetch garden plots');
 
-        const plots = await response.json();
-        console.log('Garden plots:', plots);
+        const plots = await res.json();
+        gardenPlotsDiv.innerHTML = '';
 
         let plotsUsed = 0;
         let totalValue = 0;
 
-        // Create 20 plots
-        gardenPlotsDiv.innerHTML = '';
         for (let i = 1; i <= 20; i++) {
             const plot = plots.find(p => p.plot_number === i);
             const isEmpty = !plot || !plot.plant_id;
@@ -101,56 +100,31 @@ async function loadGardenPlots() {
             plotDiv.dataset.plotNumber = i;
 
             if (isEmpty) {
-                plotDiv.innerHTML = `
-                    <div class="plot-visual empty">
-                        <div class="plot-content">
-                            <p class="plot-status">Empty</p>
-                        </div>
-                    </div>
-                    <div class="plot-info">
-                        <p class="plot-number">#${i}</p>
-                    </div>
-                `;
+                plotDiv.dataset.empty = 'true';
             } else {
-                plotDiv.innerHTML = `
-                    <div class="plot-visual planted">
-                        <img 
-                            class="plant-image"
-                            src="pixel_plants/${plot.plantImage}"
-                            alt="${plot.name || 'Unknown'}"
-                            onerror="this.onerror=null; this.src='pixel_plants/unknown.png';"
-                        />
-                    </div>
-                    <div class="plot-info">
-                        <div>
-                            <p class="plot-number">#${i}</p>
-                            <p class="plant-name">${plot.name || 'Unknown'}</p>
-                            <p class="plant-value">$${plot.value || 0}</p>
-                        </div>
-                        <button class="btn-harvest" data-plot-number="${plot.plot_number}">Harvest</button>
-                    </div>
-                `;
+                plotDiv.dataset.empty = 'false';
+                plotDiv.dataset.plantName = plot.name;
+                plotDiv.dataset.plantValue = plot.value || 0;
+                plotDiv.dataset.plantImage = plot.plantImage;
             }
 
             gardenPlotsDiv.appendChild(plotDiv);
         }
 
-        // Update stats
         document.getElementById('plots-used').textContent = plotsUsed;
         document.getElementById('garden-value').textContent = totalValue;
 
-        // Add harvest button handlers
         document.querySelectorAll('.btn-harvest').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
+            btn.addEventListener('click', async e => {
                 e.stopPropagation();
-                const plotNumber = e.target.dataset.plotNumber;
+                const plotNumber = e.currentTarget.dataset.plotNumber;
                 await harvestPlant(plotNumber);
             });
         });
-
-    } catch (error) {
-        console.error('Error loading garden plots:', error);
-        gardenPlotsDiv.innerHTML = `<p>Error loading garden: ${error.message}</p>`;
+    } catch (err) {
+        console.error(err);
+        gardenPlotsDiv.innerHTML = '<p>Error loading garden plots</p>';
+        showNotification('Error loading garden', 'error');
     }
 }
 
@@ -160,112 +134,91 @@ async function harvestPlant(plotNumber) {
     const userId = getUserId();
 
     try {
-        // Use the existing /garden/sell endpoint
-        const response = await fetch(`${currentUrl}/garden/sell`, {
+        const res = await fetch(`${API_BASE}/garden/sell`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
-                user_id: parseInt(userId),
-                plot_number: parseInt(plotNumber)
-            })
+            body: JSON.stringify({ user_id: parseInt(userId), plot_number: parseInt(plotNumber) })
         });
 
-        if (response.status === 401) {
-            alert('Session expired. Please login again.');
+        if (res.status === 401) {
+            showNotification('Session expired. Please login again.', 'error');
             logout();
             return;
         }
 
-        if (!response.ok) {
-            const error = await response.json();
+        if (!res.ok) {
+            const error = await res.json();
             throw new Error(error.message || 'Failed to harvest plant');
         }
 
-        const result = await response.json();
-        alert(`Plant harvested successfully! Check your net worth.`);
-        
-        // Reload user data and garden
+        await res.json();
+        showNotification('Plant harvested successfully! Check your net worth.', 'success');
         await loadUserData();
         await loadGardenPlots();
-
-    } catch (error) {
-        console.error('Error harvesting plant:', error);
-        alert('Error harvesting plant: ' + error.message);
+    } catch (err) {
+        console.error(err);
+        showNotification('Error harvesting plant: ' + err.message, 'error');
     }
 }
 
 // ---------------- Harvest All Plants ----------------
 async function harvestAllPlants() {
-    const token = getToken();                      // /:userId
+    const token = getToken();
     const userId = getUserId();
 
     try {
-        // Get all plots first
-        const response = await fetch(`${currentUrl}/garden/${userId}`, {
+        const res = await fetch(`${API_BASE}/garden/${userId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (!response.ok) throw new Error('No plants planted');
+        if (!res.ok) throw new Error('No plants planted');
 
-        const plots = await response.json();
+        const plots = await res.json();
         const plantedPlots = plots.filter(p => p.plant_id !== null);
 
         if (plantedPlots.length === 0) {
-            alert('No plants to harvest!');
+            showNotification('No plants to harvest!', 'info');
             return;
         }
 
         let harvested = 0;
         for (const plot of plantedPlots) {
             try {
-                const sellResponse = await fetch(`${currentUrl}/garden/sell`, {
+                const sellRes = await fetch(`${API_BASE}/garden/sell`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({
-                        user_id: parseInt(userId),
-                        plot_number: plot.plot_number
-                    })
+                    body: JSON.stringify({ user_id: parseInt(userId), plot_number: plot.plot_number })
                 });
 
-                if (sellResponse.ok) {
-                    harvested++;
-                }
+                if (sellRes.ok) harvested++;
             } catch (err) {
-                console.error('Error harvesting plot:', plot.plot_number, err);
+                console.error('Error harvesting plot', plot.plot_number, err);
             }
         }
 
-        alert(`Harvested ${harvested} plants! Check your points and net worth.`);
-        
-        // Reload user data and garden
+        showNotification(`Harvested ${harvested} plants! Check your points and net worth.`, 'success');
         await loadUserData();
         await loadGardenPlots();
-
-    } catch (error) {
-        console.error('Error harvesting all plants:', error);
-        alert('Error harvesting all plants: ' + error.message);
+    } catch (err) {
+        console.error(err);
+        showNotification('Error harvesting all plants: ' + err.message, 'error');
     }
 }
 
-// ---------------- DOMContentLoaded ----------------
+// ---------------- Init ----------------
 document.addEventListener('DOMContentLoaded', async () => {
     checkAuth();
-
-    // Load user data and garden
     await loadUserData();
     await loadGardenPlots();
 
-    // Add event listeners
     document.getElementById('logout-btn').addEventListener('click', logout);
-    
+
     const harvestAllBtn = document.getElementById('harvest-all-btn');
-    if (harvestAllBtn) {
-        harvestAllBtn.addEventListener('click', harvestAllPlants);
-    }
+    if (harvestAllBtn) harvestAllBtn.addEventListener('click', harvestAllPlants);
 });

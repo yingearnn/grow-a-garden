@@ -1,0 +1,44 @@
+/* Notification System */
+#notification-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notification {
+  background: #2ECC71; /* green for success */
+  color: white;
+  border: 3px solid #27AE60;
+  padding: 0.8rem 1.2rem;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  box-shadow: 0 4px 0 #1e8449;
+  animation: slideIn 0.3s ease forwards, fadeOut 0.3s ease forwards 2.7s;
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.notification.error {
+  background: #E74C3C; /* red for errors */
+  border-color: #C0392B;
+  box-shadow: 0 4px 0 #A93226;
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}

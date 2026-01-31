@@ -1,3 +1,7 @@
+// ---------------- Notifications ----------------
+import { showNotification } from './notifications.js';
+
+
 document.addEventListener("DOMContentLoaded", function () {
      localStorage.clear();
     sessionStorage.clear();
