@@ -1,49 +1,41 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const callback = (responseStatus, responseData) => {
-    console.log("responseStatus:", responseStatus);
-    console.log("responseData:", responseData);
-    if (responseStatus == 200) {
-      // Check if login was successful
-      if (responseData.token) {
-        // Store the token in local storage
-        localStorage.setItem("token", responseData.token);
-        localStorage.setItem("userId", responseData.userId);
-        // Redirect or perform further actions for logged-in user
-        window.location.href = "homepage.html";
-      }
-    } else {
-      warningCard.classList.remove("d-none");
-      warningText.innerText = responseData.message;
-    }
-  };
+import { showNotification } from './notifications.js';
 
+document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
 
-  const warningCard = document.getElementById("warningCard");
-  const warningText = document.getElementById("warningText");
-
-  loginForm.addEventListener("submit", function (event) {
-    console.log("loginForm.addEventListener");
+  loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const username = document.getElementById("login-username").value;
-    const password = document.getElementById("login-password").value;
+    const username = document.getElementById("login-username").value.trim();
+    const password = document.getElementById("login-password").value.trim();
 
-     if (!username || !password) {
-      alert("All fields are required!");
+    if (!username || !password) {
+      showNotification("All fields are required!", "error");
       return;
     }
 
-    const data = {
-      username: username,
-      password: password,
-    };
+    try {
+      const res = await fetch(`${currentUrl}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
 
-    
-    // Perform login request
-    fetchMethod(currentUrl + "/login", callback, "POST", data);
+      const data = await res.json();
 
-    // Reset the form fields
-    loginForm.reset();
+      if (res.status === 200 && data.token) {
+        // Correct credentials → login
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.userId);
+        window.location.href = "homepage.html";
+      } else {
+        // Wrong username or password
+        const msg = data?.message || "Wrong username or password";
+        showNotification(msg, "error");
+        document.getElementById("login-password").value = ""; // clear password
+      }
+    } catch (err) {
+      console.error("Login fetch error:", err);
+    }
   });
 });

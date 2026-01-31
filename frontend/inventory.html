@@ -6,8 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Garden Game – Inventory</title>
   <link rel="stylesheet" href="css/inventory.css">
+   <link rel="stylesheet" href="css/notification.css">
 </head>
 <body>
+  <div id="notification-container"></div>
   <header class="top-bar">
     <div class="logo">
       <a href="homepage.html">🌱 Pixel Grove</a>
@@ -47,14 +49,15 @@
       <p id="modal-plant-name"></p>
       <form id="plant-form">
         <label for="plot-number">Enter plot number (1-20):</label>
-        <input type="number" id="plot-number" min="1" max="20" required placeholder="Plot number">
+        <input type="number" id="plot-number" required placeholder="Plot number">
         <button type="submit" class="btn-primary">Plant Now</button>
       </form>
     </div>
   </div>
-   <script src="js/queryCmds.js"></script>
-<script src="js/getCurrentURL.js"></script>
-  <script src="js/inventory.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/queryCmds.js"></script>
+  <script src="js/getCurrentURL.js"></script>
+  <script type="module" src="js/inventory.js"></script>
 
 </body>
 </html>

@@ -1,6 +1,6 @@
 // js/inventory.js
 
-
+import { showNotification } from './notifications.js';
 function getToken() {
     return localStorage.getItem('token');
 }
@@ -133,7 +133,7 @@ async function plantInGarden(userPlantId, plotNumber) {
     const userId = getUserId();
     
     if (plotNumber < 1 || plotNumber > 20) {
-        alert('Plot number must be between 1 and 20');
+        showNotification('Plot number must be between 1 and 20' , 'error');
         return;
     }
     
@@ -158,18 +158,18 @@ async function plantInGarden(userPlantId, plotNumber) {
         
         if (!response.ok) {
             const error = await response.json();
-            alert(error.message || 'Failed to plant');
+            showNotification(error.message || 'Failed to plant' , 'error');
             return;
         }
         
         const data = await response.json();
-        alert(`Plant planted successfully in plot ${plotNumber}!`);
+        showNotification(`Plant planted successfully in plot ${plotNumber}!` , 'error');
         
         closeModal();
         await loadInventory();
     } catch (error) {
         console.error('Error planting:', error);
-        alert('Error planting in garden');
+        showNotification('Error planting in garden' , 'error');
     }
 }
 

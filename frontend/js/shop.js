@@ -1,5 +1,5 @@
 // Don't redeclare currentUrl - it's already declared in getCurrentURL.js
-
+import { showNotification } from './notifications.js';
 // ---------------- Shop Cache Helpers ----------------
 const SHOP_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
@@ -42,11 +42,11 @@ function logout() {
 // ---------------- Error Handling ----------------
 function handleFetchError(error, fallbackMessage = 'An error occurred') {
     console.error(error);
-    alert(fallbackMessage);
+    showNotification(fallbackMessage , 'error');
 }
 
 function handleUnauthorized() {
-    alert('Session expired. Please login again.');
+    showNotification('Session expired. Please login again.' , 'error');
     logout();
 }
 

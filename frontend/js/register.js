@@ -1,7 +1,4 @@
-// ---------------- Notifications ----------------
 import { showNotification } from './notifications.js';
-
-
 document.addEventListener("DOMContentLoaded", function () {
      localStorage.clear();
     sessionStorage.clear();
@@ -27,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
         warningCard.classList.remove("d-none");
         warningText.innerText = responseData.message || "Registration failed!";
       } else {
-        alert(responseData.message || "Registration failed!");
+         showNotification(responseData.message || "Registration failed!" , 'error');
       }
     }
   };
@@ -45,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const password = document.getElementById("register-password").value.trim();
 
     if (!username || !email || !password) {
-      alert("All fields are required!");
+      showNotification("All fields are required!" , 'error');
       return;
     }
 

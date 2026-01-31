@@ -16,12 +16,12 @@ module.exports.comparePassword = (req, res, next) => {
   const callback = (err, isMatch) => {
     if (err) {
       console.error("Error bcrypt:", err);
-      res.status(500).json(err);
+      return res.status(500).json(err);
     } else {
       if (isMatch) {
         next();
       } else {
-        res.status(401).json({
+       return res.status(401).json({
           message: "Wrong password",
         });
       }

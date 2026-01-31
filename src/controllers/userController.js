@@ -198,11 +198,11 @@ module.exports.login = (req, res, next) => {
                 res.status(500).json(error);
             } else {
                 if(results.length == 0){
-                    res.status(404).json({message: "User not found"}); 
+                   return res.status(404).json({message: "User not found"}); 
                 } else {
                     res.locals.user_id = results[0].user_id
                     res.locals.hash = results[0].password
-                    next();
+                   return next();
                 }
             }
         };
