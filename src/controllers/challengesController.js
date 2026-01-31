@@ -29,9 +29,9 @@ module.exports.createNewChallenge = (req, res, next) =>
             const lastCreated = new Date(req.latestChallengeTime );
             const now = new Date();
             // 24-hour cooldown check
-            if (now - lastCreated < 1 * 60 * 60 * 1000) {
+            if (now - lastCreated < 12 * 60 * 60 * 1000) {
                 return res.status(400).json({
-                    message: "You can only create a new challenge once every 24 hours"
+                    message: "You can only create a new challenge once every 12 hours"
                 });
             }
         
