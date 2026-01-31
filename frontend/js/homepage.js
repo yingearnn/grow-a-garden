@@ -1,5 +1,4 @@
-// Don't redeclare currentUrl - it's already declared in getCurrentURL.js
-
+import { showNotification } from './notifications.js';
 // ---------------- Auth Helpers ----------------
 function getToken() {
     return localStorage.getItem('token');
@@ -33,7 +32,7 @@ async function loadUserData() {
         });
 
         if (response.status === 401) {
-            alert('Session expired. Please login again.');
+            showNotification('Session expired. Please login again.' , 'error');
             logout();
             return;
         }
@@ -50,7 +49,7 @@ async function loadUserData() {
         return user;
     } catch (error) {
         console.error('Error loading user data:', error);
-        alert('Error loading user data: ' + error.message);
+        showNotification('Error loading user data: ' + error.message , 'error');
     }
 }
 
@@ -69,7 +68,7 @@ async function loadGardenPlots() {
         });
 
         if (response.status === 401) {
-            alert('Session expired. Please login again.');
+            showNotification('Session expired. Please login again.' , 'error');
             logout();
             return;
         }
@@ -174,7 +173,7 @@ async function harvestPlant(plotNumber) {
         });
 
         if (response.status === 401) {
-            alert('Session expired. Please login again.');
+            showNotification('Session expired. Please login again.', 'error');
             logout();
             return;
         }
@@ -185,7 +184,7 @@ async function harvestPlant(plotNumber) {
         }
 
         const result = await response.json();
-        alert(`Plant harvested successfully! Check your net worth.`);
+        showNotification(`Plant harvested successfully! Check your net worth.`, 'success');
         
         // Reload user data and garden
         await loadUserData();
@@ -193,7 +192,7 @@ async function harvestPlant(plotNumber) {
 
     } catch (error) {
         console.error('Error harvesting plant:', error);
-        alert('Error harvesting plant: ' + error.message);
+        showNotification('Error harvesting plant: ' + error.message , 'error');
     }
 }
 
@@ -214,7 +213,7 @@ async function harvestAllPlants() {
         const plantedPlots = plots.filter(p => p.plant_id !== null);
 
         if (plantedPlots.length === 0) {
-            alert('No plants to harvest!');
+            showNotification('No plants to harvest!' , 'error');
             return;
         }
 
@@ -241,7 +240,7 @@ async function harvestAllPlants() {
             }
         }
 
-        alert(`Harvested ${harvested} plants! Check your points and net worth.`);
+        showNotification(`Harvested ${harvested} plants! Check your points and net worth.` , 'success');
         
         // Reload user data and garden
         await loadUserData();
@@ -249,7 +248,7 @@ async function harvestAllPlants() {
 
     } catch (error) {
         console.error('Error harvesting all plants:', error);
-        alert('Error harvesting all plants: ' + error.message);
+        showNotification('Error harvesting all plants: ' + error.message , 'error');
     }
 }
 
