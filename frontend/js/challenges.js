@@ -65,7 +65,7 @@ async function editChallenge(challengeId) {
             return;
         }
 
-        alert('Challenge updated successfully!');
+        showNotification('Challenge updated successfully!' , 'success');
         document.getElementById('edit-modal').classList.remove('active');
         await loadChallenges(); // refresh list
 
