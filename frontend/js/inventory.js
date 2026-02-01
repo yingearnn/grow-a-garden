@@ -1,26 +1,11 @@
 // js/inventory.js
 
 import { showNotification } from './notifications.js';
-function getToken() {
-    return localStorage.getItem('token');
-}
+import { getToken } from './auth.js';
+import { getUserId } from './auth.js';
+import { checkAuth } from './auth.js';
+import { logout } from './auth.js';
 
-function getUserId() {
-    return localStorage.getItem('userId');
-}
-
-function checkAuth() {
-    if (!getToken() || !getUserId()) {
-        window.location.href = 'login.html';
-    }
-}
-
-function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    window.location.href = 'login.html';
-}
 
 async function loadUserData() {
     const token = getToken();
