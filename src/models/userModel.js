@@ -61,3 +61,14 @@ module.exports.login = (data, callback) => {
     pool.query(SQLSTATEMENT, VALUES, callback);
 };
 
+module.exports.selectTop10 = (callback) => {
+    const SQLSTATEMENT = `
+        SELECT username , points , net_worth
+        FROM User
+        ORDER BY net_worth DESC
+        LIMIT 10;
+    `;
+
+    pool.query(SQLSTATEMENT, callback);
+};
+

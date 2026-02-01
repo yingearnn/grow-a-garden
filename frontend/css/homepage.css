@@ -446,3 +446,31 @@ body::before {
     width: 100%;
   }
 }
+
+.btn-leaderboard {
+  background: #F39C12;
+  color: white;
+  border: 3px solid #E67E22;
+  padding: 0.6rem 1.5rem;  /* Changed from 0.8rem 2rem to match logout button */
+  box-shadow: 0 4px 0 #D35400;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
+}
+
+.btn-leaderboard:hover {
+  background: #E67E22;
+  top: 2px;
+  box-shadow: 0 2px 0 #D35400;
+}
+
+.btn-leaderboard:active {
+  box-shadow: none;
+  top: 4px;
+}

@@ -214,3 +214,16 @@ module.exports.login = (req, res, next) => {
         res.status(500).json(error);
     }
 };
+
+module.exports.readTop10 = (req, res, next) =>
+{
+    const callback = (error, results, fields) => {
+        if (error) {
+            console.error("Error readTop10User:", error);
+           return res.status(500).json(error);
+        } 
+        else return res.status(200).json(results);
+    }
+
+    userModel.selectTop10(callback);
+}
