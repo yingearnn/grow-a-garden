@@ -2,26 +2,10 @@
 import { showNotification } from './notifications.js';
 
 // ---------------- Auth Helpers ----------------
-function getToken() {
-    return localStorage.getItem('token');
-}
-
-function getUserId() {
-    return localStorage.getItem('userId');
-}
-
-function checkAuth() {
-    if (!getToken() || !getUserId()) {
-        window.location.href = 'login.html';
-    }
-}
-
-function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    window.location.href = 'login.html';
-}
+import { getToken } from './auth.js';
+import { getUserId } from './auth.js';
+import { checkAuth } from './auth.js';
+import { logout } from './auth.js';
 
 // ---------------- Error Handling ----------------
 function handleFetchError(error, fallbackMessage = 'An error occurred') {
