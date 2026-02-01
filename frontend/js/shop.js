@@ -241,7 +241,6 @@ async function buyTool(toolId, cost, multiplier) {
     const user = await loadUserData();
     if (user.points < cost) return alert('Insufficient points!'), false;
 
-    if (!confirm(`This tool will multiply all your planted plants by ${multiplier}x. Continue?`)) return false;
 
     const res = await fetch(`${currentUrl}/tools/${toolId}/buy`, {
         method: 'POST',
