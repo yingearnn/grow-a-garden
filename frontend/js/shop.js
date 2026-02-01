@@ -1,4 +1,4 @@
-// Don't redeclare currentUrl - it's already declared in getCurrentURL.js
+
 
 // ---------------- Shop Cache Helpers ----------------
 const SHOP_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
