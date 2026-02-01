@@ -74,7 +74,7 @@ module.exports.getUserCompletionById = (req, res, next) =>
               if(results.length == 0) 
               {
                  return res.status(404).json({
-                      message: "User completion not found"
+                      message: "You have not completed any challenge"
                   });
               }
               else {

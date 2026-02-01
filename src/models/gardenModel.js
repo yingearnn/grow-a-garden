@@ -49,7 +49,7 @@ module.exports.plantInPlot = (data, callback) => {
 // Get a planted plot
 module.exports.getPlantedPlot = (data, callback) => {
     const SQL = `
-        SELECT gp.plant_id, gp.value
+        SELECT gp.plant_id, gp.value , gp.planted_on
         FROM GardenPlots gp
         WHERE gp.user_id = ? AND gp.plot_number = ?;
     `;

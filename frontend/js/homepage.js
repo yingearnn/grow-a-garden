@@ -168,7 +168,7 @@ async function harvestPlant(plotNumber) {
         }
 
         const result = await response.json();
-        showNotification(`Plant harvested successfully! Check your net worth.`, 'success');
+        showNotification(result.message, 'success');
         
         // Reload user data and garden
         await loadUserData();

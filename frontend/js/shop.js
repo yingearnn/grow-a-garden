@@ -86,12 +86,21 @@ function renderPlants(plants) {
             const success = await buyPlant(plantId, cost);
             if (!success) return;
 
-            const cache = getShopCache();
-            const plant = cache.plants.find(p => p.plant_id == plantId);
-            plant.stock--;
+           const cache = getShopCache();
 
-            setShopCache(cache);
-            renderPlants(cache.plants);
+          if (!cache || !cache.plants) return;
+
+        const plantIndex = cache.plants.findIndex(p => p.plant_id == plantId);
+        if (plantIndex === -1) return;
+
+        cache.plants[plantIndex].stock -= 1;
+
+        setShopCache({
+         ...cache,
+        plants: cache.plants
+         });
+
+renderPlants(cache.plants);
         });
     });
 }
@@ -162,12 +171,19 @@ function renderTools(tools) {
             const success = await buyTool(toolId, cost, multiplier);
             if (!success) return;
 
-            const cache = getShopCache();
-            const tool = cache.tools.find(t => t.item_id == toolId);
-            tool.stock--;
+           const cache = getShopCache();
 
-            setShopCache(cache);
-            renderTools(cache.tools);
+           const index = cache.tools.findIndex(t => t.item_id == toolId);
+           if (index === -1) return;
+
+           cache.tools[index].stock -= 1;
+
+           setShopCache({
+           ...cache,
+            tools: cache.tools
+                });
+
+          renderTools(cache.tools);
         });
     });
 }

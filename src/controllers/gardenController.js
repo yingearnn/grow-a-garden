@@ -141,8 +141,17 @@ module.exports.clearGardenPlot = (req, res, next) => {
 module.exports.sellPlant = (req, res, next) => {
     const data = {
         user_id: req.body.user_id,
-        value: req.plant.value
+        value: req.plant.value,
+        time: req.plant.planted_on
     };
+
+            const lastTime = new Date(data.time);
+            const now = new Date();
+            //  30 minute cooldown
+            if (now - lastTime < 30 * 60 * 1000) {
+                return res.status(400).json({ message: "Plants can only be sold after 30 minutes" });
+            }
+        
 
     const callback = (error) => {
         if (error) {
