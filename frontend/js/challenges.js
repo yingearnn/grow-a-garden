@@ -1,27 +1,11 @@
 // js/challenges.js
 import { showNotification } from './notifications.js';
-const API_BASE = window.location.origin;
+import { getToken } from './auth.js';
+import { getUserId } from './auth.js';
+import { checkAuth } from './auth.js';
+import { logout } from './auth.js';
 
-function getToken() {
-    return localStorage.getItem('token');
-}
 
-function getUserId() {
-    return localStorage.getItem('userId');
-}
-
-function checkAuth() {
-    if (!getToken() || !getUserId()) {
-        window.location.href = 'login.html';
-    }
-}
-
-function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    window.location.href = 'login.html';
-}
 
 function openEditModal(challengeId, description, points) {
     const modal = document.getElementById('edit-modal');
@@ -46,7 +30,7 @@ async function editChallenge(challengeId) {
     const points = parseInt(document.getElementById('edit-points').value);
 
     try {
-        const response = await fetch(`${API_BASE}/challenges/${challengeId}`, {
+        const response = await fetch(`${currentUrl}/challenges/${challengeId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -83,7 +67,7 @@ async function deleteChallenge(challengeId, description) {
     const token = getToken();
 
     try {
-        const response = await fetch(`${API_BASE}/challenges/${challengeId}`, {
+        const response = await fetch(`${currentUrl}/challenges/${challengeId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -115,7 +99,7 @@ async function loadUserData() {
     const userId = getUserId();
     
     try {
-        const response = await fetch(`${API_BASE}/user/${userId}`, {
+        const response = await fetch(`${currentUrl}/user/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -142,7 +126,7 @@ async function loadChallenges() {
     const token = getToken();
     
     try {
-        const response = await fetch(`${API_BASE}/challenges`, {
+        const response = await fetch(`${currentUrl}/challenges`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -240,7 +224,7 @@ async function loadCompletedChallenges() {
     const userId = getUserId();
     
     try {
-        const challengesResponse = await fetch(`${API_BASE}/challenges`, {
+        const challengesResponse = await fetch(`${currentUrl}/challenges`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -254,7 +238,7 @@ async function loadCompletedChallenges() {
         
         for (const challenge of challenges) {
             try {
-                const completionResponse = await fetch(`${API_BASE}/challenges/${challenge.challenge_id}/`, {
+                const completionResponse = await fetch(`${currentUrl}/challenges/${challenge.challenge_id}/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -373,7 +357,7 @@ async function createChallenge(event) {
     }
     
     try {
-        const response = await fetch(`${API_BASE}/challenges`, {
+        const response = await fetch(`${currentUrl}/challenges`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -441,7 +425,7 @@ async function completeChallenge(challengeId) {
     const details = document.getElementById('completion-details').value;
     
     try {
-        const response = await fetch(`${API_BASE}/challenges/${challengeId}/complete`, {
+        const response = await fetch(`${currentUrl}/challenges/${challengeId}/complete`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
