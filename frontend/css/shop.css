@@ -114,40 +114,9 @@ body {
   font-weight: bold;
 }
 
-.btn-refresh {
-  background: #F39C12;
-  color: white;
-  border: 3px solid #E67E22;
-  padding: 0.7rem 1.5rem;
-  box-shadow: 0 4px 0 #D35400;
-  cursor: pointer;
-  font-weight: bold;
-  font-family: 'Courier New', monospace;
-  text-transform: uppercase;
-  margin-top: 1rem;
-  transition: all 0.1s ease;
-  position: relative;
-  top: 0;
-}
 
-.btn-refresh:hover:not(:disabled) {
-  background: #E67E22;
-  top: 2px;
-  box-shadow: 0 2px 0 #D35400;
-}
 
-.btn-refresh:active:not(:disabled) {
-  box-shadow: none;
-  top: 4px;
-}
 
-.btn-refresh:disabled {
-  background: #95A5A6;
-  border-color: #7F8C8D;
-  box-shadow: 0 4px 0 #5D6D7E;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
 
 /* Shop Section */
 .shop-section {
