@@ -91,7 +91,7 @@ async function loadPlants(forceRefresh = false) {
     // Check for cached state first
     if (!forceRefresh) {
         const cachedState = getShopState();
-        if (cachedState && cachedState.plants) {
+        if (cachedState && cachedState.plants && cachedState.plants.length > 0) {
             renderPlants(cachedState.plants);
             return;
         }
@@ -115,9 +115,9 @@ async function loadPlants(forceRefresh = false) {
         // Generate featured plants
         const featuredPlants = generateFeaturedPlants(plants);
         
-        // Save to localStorage
-        const currentState = getShopState() || {};
-        saveShopState(featuredPlants, currentState.tools || []);
+        // Save to localStorage - preserve existing tools
+        const currentState = getShopState() || { plants: [], tools: [] };
+        saveShopState(featuredPlants, currentState.tools);
         
         renderPlants(featuredPlants);
 
@@ -207,7 +207,7 @@ function updatePlantStockInStorage(plantId, newStock) {
         const plant = state.plants.find(p => p.plant_id == plantId);
         if (plant) {
             plant.stock = newStock;
-            saveShopState(state.plants, state.tools);
+            saveShopState(state.plants, state.tools || []);
         }
     }
 }
@@ -219,7 +219,7 @@ async function loadTools(forceRefresh = false) {
     // Check for cached state first
     if (!forceRefresh) {
         const cachedState = getShopState();
-        if (cachedState && cachedState.tools) {
+        if (cachedState && cachedState.tools && cachedState.tools.length > 0) {
             renderTools(cachedState.tools);
             return;
         }
@@ -241,9 +241,9 @@ async function loadTools(forceRefresh = false) {
         const tools = await response.json();
         const featuredTools = generateFeaturedTools(tools);
         
-        // Save to localStorage
-        const currentState = getShopState() || {};
-        saveShopState(currentState.plants || [], featuredTools);
+        // Save to localStorage - preserve existing plants
+        const currentState = getShopState() || { plants: [], tools: [] };
+        saveShopState(currentState.plants, featuredTools);
         
         renderTools(featuredTools);
 
@@ -327,7 +327,7 @@ function updateToolStockInStorage(toolId, newStock) {
         const tool = state.tools.find(t => t.item_id == toolId);
         if (tool) {
             tool.stock = newStock;
-            saveShopState(state.plants, state.tools);
+            saveShopState(state.plants || [], state.tools);
         }
     }
 }
