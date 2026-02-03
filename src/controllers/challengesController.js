@@ -25,7 +25,7 @@ module.exports.createNewChallenge = (req, res, next) =>
              });
            }
 
-           
+           if(req.latestChallengeTime != undefined){
             const lastCreated = new Date(req.latestChallengeTime );
             const now = new Date();
             // 24-hour cooldown check
@@ -34,6 +34,7 @@ module.exports.createNewChallenge = (req, res, next) =>
                     message: "You can only create a new challenge once every 12 hours"
                 });
             }
+        }
         
 
     const callback = (error, results, fields) => {
@@ -85,16 +86,15 @@ module.exports.readLatestChallenge = (req, res, next) =>
           return res.status(500).json(error);
         } 
            
-               if (results.length > 0) {
-              req.latestChallengeTime = results[1].created_on
-              req.user_id = data.user_id
-              return next();
-               }
-
-               else{
-                req.user_id = data.user_id
-                return next();
-               }
+              if (results[1] && results[1].length > 0) {
+    req.latestChallengeTime = results[1][0].created_on;
+    req.user_id = data.user_id;
+    return next();
+} else {
+    // First time creating - set old date to allow creation
+    req.user_id = data.user_id;
+    return next();
+}
         
     }
 
