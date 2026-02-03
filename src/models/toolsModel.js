@@ -48,6 +48,9 @@ module.exports.boughtTool = (data, callback) => {
 
 module.exports.selectAllTools = (callback) => {
     const SQLSTATEMENT = `
+    UPDATE Tools
+    SET stock = FLOOR(1 + RAND() * max_stock);
+    
     SELECT * FROM Tools
     ORDER BY cost ASC;
     `;

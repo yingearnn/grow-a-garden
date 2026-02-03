@@ -3,6 +3,8 @@ const pool = require('../services/db');
 module.exports.selectAllPlants = (callback) =>
 {
     const SQLSTATEMENT = `
+    UPDATE plants
+   SET stock = FLOOR(1 + RAND() * max_stock);
     SELECT * FROM Plants;
     `;
 

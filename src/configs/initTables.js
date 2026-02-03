@@ -76,27 +76,27 @@ CREATE TABLE Plants (
     is_featured BOOLEAN DEFAULT FALSE
 );
 
-INSERT INTO Plants (plant_id, name, rarity, points, value, stock, max_stock,plantImage) VALUES
-(1, 'Sunflower', 'common', 10, 100, 10, 10,'frontendpixel_plantssunflower.png'),
-(2, 'Tulip', 'common', 15, 150, 10, 10,'frontendpixel_plantstulip.png'),
-(3, 'Rose', 'rare', 30, 400, 5, 5,'frontendpixel_plantsrose.png'),
-(4, 'Orchid', 'special', 50, 800, 3, 3,'frontendpixel_plantsorchid.png'),
-(5, 'Bonsai', 'legendary', 100, 2000, 1, 1,'frontendpixel_plantsbonsai.png'),
-(6, 'Cactus', 'common', 12, 120, 10, 10,'frontendpixel_plantscactus.png'),
-(7, 'Lavender', 'rare', 35, 500, 5, 5,'frontendpixel_plantslavender.png'),
-(8, 'Venus Flytrap', 'special', 60, 1000, 3, 3,'frontendpixel_plantsvenus_flytrap.png'),
-(9, 'Cherry Blossom', 'legendary', 120, 3000, 1, 1,'frontendpixel_plantscherry_blossom.png'),
-(10, 'Daisy', 'common', 8, 80, 10, 10,'frontendpixel_plantsdaisy.png'),
-(11, 'Mint', 'common', 11, 110, 10, 10,'frontendpixel_plantsmint.png'),
-(12, 'Aloe Vera', 'rare', 28, 380, 5, 5,'frontendpixel_plantsaloe_vera.png'),
-(13, 'Peony', 'rare', 40, 550, 5, 5,'frontendpixel_plantspeony.png'),
-(14, 'Pitcher Plant', 'special', 55, 900, 3, 3,'frontendpixel_plantspitcher_plant.png'),
-(15, 'Blue Rose', 'special', 70, 1200, 3, 3,'frontendpixel_plantsblue_rose.png'),
-(16, 'Golden Bamboo', 'legendary', 150, 4000, 1, 1,'frontendpixel_plantsgolden_bamboo.png'),
-(17, 'Moon Orchid', 'legendary', 180, 5000, 1, 1,'frontendpixel_plantsmoon_orchid.png'),
-(18, 'Fern', 'common', 9, 90, 10, 10,'frontendpixel_plantsfern.png'),
-(19, 'Jade Plant', 'rare', 32, 450, 5, 5,'frontendpixel_plantsjade_plant.png'),
-(20, 'Lotus', 'special', 65, 1100, 3, 3,'frontendpixel_plantslotus.png');
+INSERT INTO Plants (plant_id, name, rarity, points, value, max_stock,plantImage) VALUES
+(1, 'Sunflower', 'common', 10, 100, 10,'frontendpixel_plantssunflower.png'),
+(2, 'Tulip', 'common', 15, 150, 10,'frontendpixel_plantstulip.png'),
+(3, 'Rose', 'rare', 30, 400,  5,'frontendpixel_plantsrose.png'),
+(4, 'Orchid', 'special', 50, 800,  3,'frontendpixel_plantsorchid.png'),
+(5, 'Bonsai', 'legendary', 100, 2000,  1,'frontendpixel_plantsbonsai.png'),
+(6, 'Cactus', 'common', 12, 120,  10,'frontendpixel_plantscactus.png'),
+(7, 'Lavender', 'rare', 35, 500,  5,'frontendpixel_plantslavender.png'),
+(8, 'Venus Flytrap', 'special', 60, 1000, 3,'frontendpixel_plantsvenus_flytrap.png'),
+(9, 'Cherry Blossom', 'legendary', 120, 3000,  1,'frontendpixel_plantscherry_blossom.png'),
+(10, 'Daisy', 'common', 8, 80,  10,'frontendpixel_plantsdaisy.png'),
+(11, 'Mint', 'common', 11, 110,  10,'frontendpixel_plantsmint.png'),
+(12, 'Aloe Vera', 'rare', 28, 380,  5,'frontendpixel_plantsaloe_vera.png'),
+(13, 'Peony', 'rare', 40, 550,  5,'frontendpixel_plantspeony.png'),
+(14, 'Pitcher Plant', 'special', 55, 900,  3,'frontendpixel_plantspitcher_plant.png'),
+(15, 'Blue Rose', 'special', 70, 1200, 3,'frontendpixel_plantsblue_rose.png'),
+(16, 'Golden Bamboo', 'legendary', 150, 4000, 1,'frontendpixel_plantsgolden_bamboo.png'),
+(17, 'Moon Orchid', 'legendary', 180, 5000,  1,'frontendpixel_plantsmoon_orchid.png'),
+(18, 'Fern', 'common', 9, 90,  10,'frontendpixel_plantsfern.png'),
+(19, 'Jade Plant', 'rare', 32, 450,  5,'frontendpixel_plantsjade_plant.png'),
+(20, 'Lotus', 'special', 65, 1100,  3,'frontendpixel_plantslotus.png');
 
 
 -- USER PLANTS
