@@ -60,22 +60,30 @@ async function editChallenge(challengeId) {
 }
 
 async function deleteChallenge(challengeId, description) {
-    if (!confirm(`Are you sure you want to delete "${description}"?`)) {
-        return;
-    }
 
     const token = getToken();
+    const userId = getUserId();
 
     try {
         const response = await fetch(`${currentUrl}/challenges/${challengeId}`, {
             method: 'DELETE',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
-            }
+            },
+            body: JSON.stringify({
+                user_id: parseInt(userId)
+            })
         });
 
         if (response.status === 401) {
             logout();
+            return;
+        }
+
+        if (response.status === 204) {
+            showNotification('Challenge deleted successfully!', 'success');
+            await loadChallenges();
             return;
         }
 
