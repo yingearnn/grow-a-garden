@@ -158,7 +158,7 @@ function renderPlants(plants) {
                 <span class="rarity ${plant.rarity}">${plant.rarity.toUpperCase()}</span>
                 <p>Base Value: $${plant.value}</p>
                 <p class="price">Cost: ${plant.points} points</p>
-                <p class="stock">Stock: ${plant.stock}/${plant.max_stock}</p>
+                <p class="stock">Stock: ${plant.stock}</p>
                 <button class="btn-buy" 
                     data-plant-id="${plant.plant_id}" 
                     data-cost="${plant.points}" 
@@ -184,9 +184,10 @@ function attachPlantBuyHandlers() {
             const success = await buyPlant(plantId, cost);
 
             if (success) {
-                let [current, max] = stockText.textContent.match(/\d+/g).map(Number);
+                // Extract just the number from "Stock: 4"
+                let current = parseInt(stockText.textContent.match(/\d+/)[0]);
                 current--;
-                stockText.textContent = `Stock: ${current}/${max}`;
+                stockText.textContent = `Stock: ${current}`;
 
                 if (current <= 0) {
                     e.target.disabled = true;
@@ -278,7 +279,7 @@ function renderTools(tools) {
                 <h3>${tool.name}</h3>
                 <p>Multiplier: ${tool.multiplier}x</p>
                 <p class="price">Cost: ${tool.cost} points</p>
-                <p class="stock">Stock: ${tool.stock}/${tool.max_stock}</p>
+                <p class="stock">Stock: ${tool.stock}</p>
                 <button class="btn-buy" 
                     data-tool-id="${tool.item_id}" 
                     data-cost="${tool.cost}" 
@@ -305,9 +306,10 @@ function attachToolBuyHandlers() {
             const success = await buyTool(toolId, cost, multiplier);
 
             if (success) {
-                let [current, max] = stockText.textContent.match(/\d+/g).map(Number);
+                // Extract just the number from "Stock: 4"
+                let current = parseInt(stockText.textContent.match(/\d+/)[0]);
                 current--;
-                stockText.textContent = `Stock: ${current}/${max}`;
+                stockText.textContent = `Stock: ${current}`;
 
                 if (current <= 0) {
                     e.target.disabled = true;
@@ -446,9 +448,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     startShopRefreshTimer();
 
     document.getElementById('logout-btn').addEventListener('click', logout);
-    document.getElementById('refresh-shop-btn').addEventListener('click', () => {
-        clearShopState(); // Clear cache when manually refreshing
-        loadPlants(true); // Force refresh
-        loadTools(true);
-    });
 });
