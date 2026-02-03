@@ -27,7 +27,7 @@ CREATE TABLE User (
     email TEXT NOT NULL,
     password TEXT NOT NULL,
     username VARCHAR(255) NOT NULL UNIQUE,
-    points INT DEFAULT 0,
+    points INT DEFAULT 100000,
     net_worth INT DEFAULT 0
 );
 
