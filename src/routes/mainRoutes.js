@@ -36,7 +36,7 @@ router.post(
   bcryptMiddleware.comparePassword,
   jwtMiddleware.generateToken,
   jwtMiddleware.sendToken
-);
+); //DONE
 
 // Register route
 // Flow:
@@ -50,7 +50,7 @@ router.post(
   userController.createNewUser,
   jwtMiddleware.generateToken,
   jwtMiddleware.sendToken
-);
+); //DONE
 
 // Export router to be used in app.js
 module.exports = router;

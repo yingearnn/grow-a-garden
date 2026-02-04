@@ -14,7 +14,7 @@ const toolsController = require('../controllers/toolsController');
 router.use(jwtMiddleware.verifyToken);
 
 // Retrieve all tools for shop display
-router.get('/', toolsController.getAllTools);
+router.get('/', toolsController.getAllTools); // DONE
 
 // Buy a tool
 // Flow:
@@ -26,7 +26,7 @@ router.post(
   userController.validateUser,
   toolsController.selectToolsById,
   toolsController.buyTools
-);
+); //DONE
 
 // Export router to be mounted in main routes file
 module.exports = router;

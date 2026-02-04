@@ -9,7 +9,7 @@ router.use(jwtMiddleware.verifyToken);
 
 
 // Now all routes below are protected
-router.get('/:userId', gardenController.getGardenPlots);
+router.get('/:userId', gardenController.getGardenPlots); //DONE
 
 //plant from inventory into plot
 router.post(
@@ -18,7 +18,7 @@ router.post(
     gardenController.checkPlot,
     gardenController.plantIntoPlot,
     gardenController.markAsPlanted
-);
+); //DONE
 
 //sell a planted plant
 router.post(
@@ -26,6 +26,6 @@ router.post(
     gardenController.readPlantedPlot,
     gardenController.clearGardenPlot,
     gardenController.sellPlant
-);
+); //DONE
 
 module.exports = router;

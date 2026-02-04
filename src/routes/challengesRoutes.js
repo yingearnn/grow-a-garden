@@ -22,10 +22,10 @@ router.post(
   challengesController.readLatestChallenge,
   userController.validateUser,
   challengesController.createNewChallenge
-);
+); //DONE
 
 // Retrieve all challenges
-router.get('/', challengesController.readAllChallenges);
+router.get('/', challengesController.readAllChallenges); //DONE
 
 // Delete a challenge (only creator allowed)
 // getChallengeById fetches the challenge and attaches it to req.challenge
@@ -36,7 +36,7 @@ router.delete(
   challengesController.getChallengeById,
   userController.validateUser,
   challengesController.deleteChallengesById
-);
+); //DONE
 
 // Update a challenge (only creator allowed)
 // getChallengeById fetches challenge
@@ -47,7 +47,7 @@ router.put(
   challengesController.getChallengeById,
   userController.validateUser,
   challengesController.updateChallengesById
-);
+); // DONE
 
 // Complete a challenge and award points
 // getChallengeById gets challenge info
@@ -60,11 +60,11 @@ router.post(
   userController.validateUser,
   completionController.createNewRecord,
   completionController.updateUserPoints
-);
+); //DONE
 
 // Retrieve completion records for a specific challenge
 // Used to display completed challenges in frontend
-router.get('/:id/', completionController.getUserCompletionById);
+router.get('/:id/', completionController.getUserCompletionById); //DONE
 
 // Export router to be used in main app
 module.exports = router;

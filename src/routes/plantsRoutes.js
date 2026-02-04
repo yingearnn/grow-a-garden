@@ -14,7 +14,7 @@ const userController = require('../controllers/userController');
 router.use(jwtMiddleware.verifyToken);
 
 // Retrieve all plants available in the shop
-router.get('/', plantsController.readAllPlants);
+router.get('/', plantsController.readAllPlants); //DONE
 
 // Buy a plant
 // Flow:
@@ -26,11 +26,11 @@ router.post(
   userController.validateUser,
   plantsController.readPlantById,
   plantsController.buyPlants
-);
+); //DONE
 
 // Retrieve plants owned by a specific user
 // Used to display inventory
-router.get('/:id/', plantsController.ownedPlantsById);
+router.get('/:id/', plantsController.ownedPlantsById);//DONE
 
 // Export router to be mounted in main routes file
 module.exports = router;
