@@ -48,7 +48,7 @@ module.exports.checkPlot = (req, res, next) => {
 
   // reject NaN + decimals
   if (!Number.isInteger(plot_number)) {
-    return res.status(400).json({ message: "plot_number must be a whole number" });
+    return res.status(400).json({ message: "Plot number must be a whole number" });
   }
 
   if (plot_number < 1 || plot_number > 20 ) {
@@ -122,10 +122,6 @@ module.exports.markAsPlanted = (req, res) => {
 module.exports.readPlantedPlot = (req, res, next) => {
   const loggedInUserId = res.locals.userId;
   const plot_number = req.body.plot_number;
-
-  if (plot_number === undefined) {
-    return res.status(400).json({ message: "plot number is required" });
-  }
 
   const data = {
     user_id: loggedInUserId,

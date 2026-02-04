@@ -110,10 +110,7 @@ function openPlantModal(userPlantId, plantName) {
     const plotNumber = Number(raw)
 
     // Keep only basic "is number" validation.
-    if (Number.isNaN(plotNumber)) {
-      showNotification("Please enter a plot number.", "error");
-      return;
-    }
+   
 
     await plantInGarden(userPlantId, plotNumber);
   };
