@@ -45,6 +45,11 @@ async function editChallenge(challengeId) {
     return;
   }
 
+   if (points > 50 && points <=0) {
+    showNotification("Points must be between 1 and 50", "error");
+    return;
+  }
+
   try {
     const response = await fetch(`${currentUrl}/challenges/${challengeId}`, {
       method: "PUT",
