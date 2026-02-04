@@ -1,5 +1,5 @@
 const pool = require('../services/db');
-
+//select a specific tool
 module.exports.selectToolsById = (data, callback) => {
     const SQLSTATEMENT = `
     SELECT * FROM Tools
@@ -8,7 +8,7 @@ module.exports.selectToolsById = (data, callback) => {
     const VALUES = [data.id];
     pool.query(SQLSTATEMENT, VALUES, callback);
 }
-
+//buying of the tool
 module.exports.boughtTool = (data, callback) => {
     const SQLSTATEMENT = `
     -- Record the tool purchase
@@ -45,12 +45,12 @@ module.exports.boughtTool = (data, callback) => {
 
     pool.query(SQLSTATEMENT, VALUES, callback);
 };
-
+//Select all the tools
 module.exports.selectAllTools = (callback) => {
     const SQLSTATEMENT = `
     UPDATE Tools
     SET stock = FLOOR(1 + RAND() * max_stock);
-    
+
     SELECT * FROM Tools
     ORDER BY cost ASC;
     `;

@@ -48,6 +48,7 @@ const VALUES = [data.username,data.user_id];
 pool.query(SQLSTATEMENT, VALUES, callback);
 }
 
+//Get user's info for login
 module.exports.login = (data, callback) => {
 
     const SQLSTATEMENT = `
@@ -61,6 +62,7 @@ module.exports.login = (data, callback) => {
     pool.query(SQLSTATEMENT, VALUES, callback);
 };
 
+//get users with the highest net_worth
 module.exports.selectTop10 = (callback) => {
     const SQLSTATEMENT = `
         SELECT username , points , net_worth

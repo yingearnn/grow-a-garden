@@ -1,5 +1,5 @@
 const pool = require('../services/db');
-
+//get all plants
 module.exports.selectAllPlants = (callback) =>
 {
     const SQLSTATEMENT = `
@@ -10,7 +10,7 @@ module.exports.selectAllPlants = (callback) =>
 
     pool.query(SQLSTATEMENT, callback);
 }
-
+//get a specific plant
 module.exports.selectPlantsById = (data, callback) =>  
 {
     const SQLSTATEMENT = `
@@ -21,7 +21,7 @@ module.exports.selectPlantsById = (data, callback) =>
 
     pool.query(SQLSTATEMENT, VALUES, callback);
 }
-
+//buy a specific plant
 module.exports.boughtPlant = (data, callback) => 
 {
     const SQLSTATEMENT = `
@@ -41,7 +41,7 @@ module.exports.boughtPlant = (data, callback) =>
 
     pool.query(SQLSTATEMENT, VALUES, callback);
 }
-
+//get plants owned by user
 module.exports.getOwned = (data, callback) =>
 {
     const SQLSTATEMENT = `
