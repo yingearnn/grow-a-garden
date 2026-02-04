@@ -31,10 +31,10 @@ CREATE TABLE User (
     net_worth INT DEFAULT 0
 );
 
-INSERT INTO User (user_id, username, email, password) VALUES
-(1, 'happyPlant', 'happyplant@gmail.com', '${hash}'),
-(2, 'the_sunflowerguy', 'sunny@gmail.com', '${hash}'),
-(3, 'plantMakesMEEhappy', 'MEe@gmail.com', '${hash}');
+INSERT INTO User (user_id, username, points, email, password) VALUES
+(1, 'happyPlant', 100000000 , 'happyplant@gmail.com', '${hash}'),
+(2, 'the_sunflowerguy', 0,'sunny@gmail.com', '${hash}'),
+(3, 'plantMakesMEEhappy',0, 'MEe@gmail.com', '${hash}');
 
 -- TOOLS
 CREATE TABLE Tools (
@@ -164,6 +164,12 @@ INSERT INTO WellnessChallenge (creator_id, description, points) VALUES
 (2, 'IRL > DMs - Talk to a friend face-to-face', 20),
 (3, 'Declutter your chaos - Clean your desk or room', 20),
 (3, 'Help a homie - Assist someone without being asked', 20);
+
+CREATE TABLE challenge_creation_log (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  created_on DATETIME NOT NULL DEFAULT NOW()
+);
 
 -- USER COMPLETION
 CREATE TABLE UserCompletion (

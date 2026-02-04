@@ -112,37 +112,27 @@ module.exports.readAllChallenges = (req, res, next) =>
 // - Used to enforce cooldown for createNewChallenge
 // - Sets req.latestChallengeTime and req.user_id
 // =========================
-module.exports.readLatestChallenge = (req, res, next) =>
-{
-    // NOTE: user ID is coming from res.locals.userId (set by JWT middleware)
-    const data = {
-        user_id: res.locals.userId
+module.exports.readLatestChallenge = (req, res, next) => {
+  const data = { user_id: res.locals.userId };
+
+  const callback = (error, results) => {
+    if (error) {
+      console.error("Error readLatestChallenge(log):", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
 
-    const callback = (error, results, fields) => {
-        if (error) {
-            console.error("Error readAllChallenges:", error);
-            return res.status(500).json({
-                message: "Internal server error"
-            });
-        }
-
-        // If user has a previous created challenge, store its time
-        // NOTE: results[1] suggests stored procedure result format
-        if (results[1] && results[1].length > 0) {
-            req.latestChallengeTime = results[1][0].created_on;
-            req.user_id = data.user_id;
-            return next();
-        } else {
-            // If first-time creator, no cooldown time needed
-            req.user_id = data.user_id;
-            return next();
-        }
+    // results should be a normal array now (NOT results[1])
+    if (results && results.length > 0) {
+      req.latestChallengeTime = results[0].created_on;
+    } else {
+      req.latestChallengeTime = undefined;
     }
 
-    // Query DB for latest challenge by user
-    challengesModel.selectLatest(data, callback);
-}
+    return next();
+  };
+
+  challengesModel.selectLatestCreateLog(data, callback);
+};
 
 
 // =========================

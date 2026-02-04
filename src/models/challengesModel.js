@@ -11,9 +11,13 @@ module.exports.insertChallenge = (data, callback) =>
         UPDATE User
         SET points = points - 10
         WHERE user_id = ?;
+
+         INSERT INTO challenge_creation_log (user_id, created_on)
+        VALUES (?, NOW());
+  
     `;
 
-    const VALUES = [data.user_id, data.description, data.points, data.user_id];
+    const VALUES = [data.user_id, data.description, data.points, data.user_id , data.user_id];
 
     pool.query(SQLSTATMENT, VALUES, callback);
 }
@@ -31,24 +35,16 @@ module.exports.selectAll = (callback) =>
 
 
 // Get user info and latest challenge created by user
-module.exports.selectLatest = (data , callback) =>
-{
-    const SQLSTATMENT = `
-        SELECT * 
-        FROM User
-        WHERE user_id = ?;
-
-        SELECT * 
-        FROM WellnessChallenge 
-        WHERE creator_id = ? 
-        ORDER BY created_on DESC 
-        LIMIT 1;
-    `;
-
-    const VALUES = [data.user_id , data.user_id];
-
-    pool.query(SQLSTATMENT, VALUES, callback);
-}
+module.exports.selectLatestCreateLog = (data, callback) => {
+  const SQL = `
+    SELECT created_on
+    FROM challenge_creation_log
+    WHERE user_id = ?
+    ORDER BY created_on DESC
+    LIMIT 1;
+  `;
+  pool.query(SQL, [data.user_id], callback);
+};
 
 
 // Delete a challenge and its completion records

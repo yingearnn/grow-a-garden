@@ -20,7 +20,7 @@ router.use(jwtMiddleware.verifyToken);
 router.post(
   '/',
   challengesController.readLatestChallenge,
-   userController.validateUser,
+  userController.validateUser,
   challengesController.createNewChallenge
 );
 
