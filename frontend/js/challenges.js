@@ -60,20 +60,14 @@ async function editChallenge(challengeId) {
 }
 
 async function deleteChallenge(challengeId, description) {
-
     const token = getToken();
-    const userId = getUserId();
 
     try {
         const response = await fetch(`${currentUrl}/challenges/${challengeId}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                user_id: parseInt(userId)
-            })
+            }
         });
 
         if (response.status === 401) {
@@ -81,6 +75,7 @@ async function deleteChallenge(challengeId, description) {
             return;
         }
 
+        // Status 204 means success with no content
         if (response.status === 204) {
             showNotification('Challenge deleted successfully!', 'success');
             await loadChallenges();
@@ -88,8 +83,13 @@ async function deleteChallenge(challengeId, description) {
         }
 
         if (!response.ok) {
-            const error = await response.json();
-            showNotification(error.message || 'Failed to delete challenge', 'error');
+            // Try to get error message from response
+            try {
+                const error = await response.json();
+                showNotification(error.message || 'Failed to delete challenge', 'error');
+            } catch {
+                showNotification('Failed to delete challenge', 'error');
+            }
             return;
         }
 
@@ -150,47 +150,45 @@ async function loadChallenges() {
             return;
         }
         
-        // Check current hour for bonus
+        // Check current hour for bonus indicator (display only)
         const currentHour = new Date().getHours();
-        const isBonus = currentHour >= 10 && currentHour < 12;
         
         const userId = getUserId();
 
         challengesList.innerHTML = challenges.map(challenge => {
-            const points = isBonus ? Math.floor(challenge.points * 1.5) : challenge.points;
-            const isCreator = parseInt(challenge.creator_id) === parseInt(userId);
+    const isCreator = parseInt(challenge.creator_id) === parseInt(userId);
 
-            return `
-                <div class="challenge-card">
-                    <h3>${challenge.description}</h3>
-                    <p class="challenge-points">
-                        ${points} points ${isBonus ? '(1.5x BONUS!)' : ''}
-                    </p>
-                    <button class="btn-complete" 
-                        data-challenge-id="${challenge.challenge_id}" 
-                        data-points="${points}" 
-                        data-description="${challenge.description}">
-                        Complete Challenge
+    return `
+        <div class="challenge-card">
+            <h3>${challenge.description}</h3>
+
+            <p class="challenge-points">
+                ${challenge.effective_points}
+                ${challenge.has_bonus ? 'points (1.5x)' : 'points'}
+            </p>
+
+            <button class="btn-complete" 
+                data-challenge-id="${challenge.challenge_id}">
+                Complete Challenge
+            </button>
+
+            ${isCreator ? `
+                <div class="creator-actions">
+                    <button class="btn-edit"
+                        data-challenge-id="${challenge.challenge_id}"
+                        data-description="${challenge.description}"
+                        data-points="${challenge.points}">
+                        Edit
                     </button>
-                    ${isCreator ? `
-                        <div class="creator-actions">
-                            <button class="btn-edit" 
-                                data-challenge-id="${challenge.challenge_id}" 
-                                data-description="${challenge.description}" 
-                                data-points="${challenge.points}">
-                                Edit
-                            </button>
-                            <button class="btn-delete" 
-                                data-challenge-id="${challenge.challenge_id}"
-                                data-description="${challenge.description}">
-                                Delete
-                            </button>
-                        </div>
-                    ` : ''}
+                    <button class="btn-delete"
+                        data-challenge-id="${challenge.challenge_id}">
+                        Delete
+                    </button>
                 </div>
-            `;
-        }).join('');
-        
+            ` : ''}
+        </div>
+    `;
+}).join('');
         // Add event listeners
         document.querySelector('.close-edit-modal').addEventListener('click', () => {
             document.getElementById('edit-modal').classList.remove('active');

@@ -24,22 +24,26 @@ module.exports.createNewRecord = (req, res, next) => {
         if (lastCompletion) {
             const lastTime = new Date(lastCompletion.completed_on);
             const now = new Date();
-            // Example: 24 hour cooldown
+            // 24 hour cooldown
             if (now - lastTime < 24 * 60 * 60 * 1000) {
                 return res.status(400).json({ message: "Challenge can be completed once every 24 hours" });
             }
         }
 
-        // Time-based bonus: 6am-8am = 1.5x points
-        let bonusMultiplier = 1;
-        const hour = new Date().getHours();
-        if (hour >= 6 && hour < 8) bonusMultiplier = 1.5;
+        // Time-based bonus: 2pm-3pm (14:00-15:00) = 1.5x points
+       const hour = new Date().getHours();
+const hasBonus = hour >= 10 && hour < 12;
+
+const bonusMultiplier = hasBonus ? 1.5 : 1;
+
+        // Calculate points with bonus
+        const pointsAwarded = Math.floor(completedChallenge.points * bonusMultiplier);
 
         const data = {
             user_id: existUser.user_id,
             challenge_id: completedChallenge.challenge_id,
             details: req.body.details,
-            points: completedChallenge.points * bonusMultiplier
+            points: pointsAwarded
         };
 
         const callback = (error, results, fields) => {
@@ -51,6 +55,7 @@ module.exports.createNewRecord = (req, res, next) => {
                 req.challenge_id = completedChallenge.challenge_id;
                 req.user_id = existUser.user_id;
                 req.details = req.body.details;
+                req.points = pointsAwarded; // Use the calculated points with bonus
                 
                 return next();
             }
@@ -86,42 +91,12 @@ module.exports.getUserCompletionById = (req, res, next) =>
   
       completionModel.getUserCompleteById(data, callback);
 }
-// Middleware: Get points of a challenge to reward user
-module.exports.gettingPoints = (req, res, next) =>
-{
-
-
-  const data = {
-          id: req.challenge_id
-      }
-
-    const callback = (error, results, fields) => {
-
-        if (error) {
-            console.error("Error select points error:", error);
-           return res.status(500).json(error);
-        } 
-
-           if (results.length === 0) {
-      return res.status(404).json({
-        message: "Challenge not found"
-      });
-    }
-        
-         req.points = results[0].points
-         return next();
-           
-        
-    }
-
-    completionModel.getPoints(data, callback);
-}
 // Middleware: Update user points after completing challenge
 module.exports.updateUserPoints = (req, res, next) => {
 
     const data = {
-        user_id:req.user_id,
-        points:req.points
+        user_id: req.user_id,
+        points: req.points // This now has the bonus multiplier applied
     }
 
     const callback = (error, results, fields) => {
@@ -140,7 +115,7 @@ module.exports.updateUserPoints = (req, res, next) => {
             complete_id:  req.complete_id,
             challenge_id: req.challenge_id,
             user_id: req.user_id,
-            details:req.details,
+            details: req.details,
             points_awarded: req.points
         });
 

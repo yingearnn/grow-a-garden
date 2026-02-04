@@ -61,17 +61,34 @@ module.exports.createNewChallenge = (req, res, next) =>
 // Retrieves all challenges from database
 module.exports.readAllChallenges = (req, res, next) =>
 {
-    const callback = (error, results, fields) => {
+    const callback = (error, results) => {
         if (error) {
             console.error("Error readAllChallenges:", error);
-          return res.status(500).json(error);
-        } 
-        else
-         return res.status(200).json(results);
-    }
+            return res.status(500).json(error);
+        }
+
+        const hour = new Date().getHours();
+        const isBonusTime = hour >= 10 && hour < 12;   // your backend bonus window
+
+        const formatted = results.map(challenge => {
+            const has_bonus = isBonusTime;
+
+            const effective_points = has_bonus
+                ? Math.floor(challenge.points * 1.5)
+                : challenge.points;
+
+            return {
+                ...challenge,
+                has_bonus,
+                effective_points
+            };
+        });
+
+        return res.status(200).json(formatted);
+    };
 
     challengesModel.selectAll(callback);
-}
+};
 
 module.exports.readLatestChallenge = (req, res, next) =>
 

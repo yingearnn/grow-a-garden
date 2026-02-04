@@ -10,12 +10,11 @@ router.delete('/:id', challengesController.getChallengeById,userController.valid
 router.put( "/:id", challengesController.getChallengeById,userController.validateUser,challengesController.updateChallengesById
 );
 router.post(
-  '/:id/complete',   // ✅ add "complete" here so it matches frontend
+  '/:id/complete',
   challengesController.getChallengeById,
   userController.validateUser,
   completionController.createNewRecord,
-  completionController.gettingPoints,
-  completionController.updateUserPoints
+  completionController.updateUserPoints  // Removed gettingPoints middleware - bonus is calculated in createNewRecord
 );
 router.get('/:id/', completionController.getUserCompletionById);
 module.exports = router;
