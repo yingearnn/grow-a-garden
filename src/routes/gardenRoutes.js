@@ -1,25 +1,25 @@
 const express = require('express');
 const router = express.Router();
+const jwtMiddleware = require('../middlewares/jwtMiddleware');
 
-const challengesController = require('../controllers/challengesController');
-const completionController = require('../controllers/completionController');
-const userController = require('../controllers/userController');
 const gardenController = require('../controllers/gardenController');
 
-// Get all garden plots for a user
+// Apply JWT verification to ALL garden routes
+router.use(jwtMiddleware.verifyToken);
+
+// Now all routes below are protected
 router.get('/:userId', gardenController.getGardenPlots);
 
-// Plant a plant from inventory into a plot
+//plant from inventory into plot
 router.post(
     '/plant',
     gardenController.checkInventory,
     gardenController.checkPlot,
     gardenController.plantIntoPlot,
     gardenController.markAsPlanted
-    
 );
 
-// Sell a planted plant
+//sell a planted plant
 router.post(
     '/sell',
     gardenController.readPlantedPlot,

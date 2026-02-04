@@ -2,20 +2,15 @@
 const challengesModel = require("../models/challengesModel.js");
 
 // Creates a new challenge. Checks request body and returns the newly created challenge info.
-module.exports.createNewChallenge = (req, res, next) =>
-
-{
-    
-    if(req.user_id == undefined || req.body.description == undefined || req.body.points == undefined)
-    {
-       return res.status(400).json({message: "User_id or description or points is undefined"});
-        
-    }                                                      
+module.exports.createNewChallenge = (req, res, next) => {
+    if(req.user_id == undefined || req.body.description == undefined || req.body.points == undefined) {
+        return res.status(400).json({message: "Description or points is undefined"});
+    }
 
     const data = {
-      user_id: req.user_id,
-      description: req.body.description,
-      points: req.body.points
+        user_id: req.user_id,  // This comes from readLatestChallenge middleware now
+        description: req.body.description,
+        points: req.body.points
     }
       
     
@@ -41,7 +36,9 @@ module.exports.createNewChallenge = (req, res, next) =>
 
         if (error) {
             console.error("Error createNewChallenge:", error);
-           return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         } 
          // Successfully created challenge, returns it with info
         else {
@@ -64,7 +61,9 @@ module.exports.readAllChallenges = (req, res, next) =>
     const callback = (error, results) => {
         if (error) {
             console.error("Error readAllChallenges:", error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         }
 
         const hour = new Date().getHours();
@@ -94,13 +93,15 @@ module.exports.readLatestChallenge = (req, res, next) =>
 
 {
     const data = {
-      user_id: req.body.user_id
+      user_id: res.locals.userId
     }
 
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error readAllChallenges:", error);
-          return res.status(500).json(error);
+           return res.status(500).json({
+            message: "Internal server error"
+        });
         } 
            
               if (results[1] && results[1].length > 0) {
@@ -137,7 +138,9 @@ module.exports.deleteChallengesById = (req, res, next) => {
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error deleteChallengeById:", error);
-           return res.status(500).json(error);
+           return res.status(500).json({
+            message: "Internal server error"
+        });
         } else {
             const userCompletionResult = results[0]; // first DELETE
             const challengeResult = results[1]; // second DELETE
@@ -158,7 +161,9 @@ module.exports.getChallengeById = (req, res, next) => {
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error readChallengeById:", error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         } else {
             if(results.length == 0) {
                 return res.status(404).json({
@@ -208,7 +213,9 @@ module.exports.updateChallengesById = (req, res, next) =>
 
         if (error) {
             console.error("Error updateChallengeById:", error);
-           return res.status(500).json(error);
+           return res.status(500).json({
+            message: "Internal server error"
+        });
         } 
         else {
 

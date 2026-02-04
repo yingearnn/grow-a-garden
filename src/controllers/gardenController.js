@@ -104,7 +104,9 @@ module.exports.readPlantedPlot = (req, res, next) => {
     const callback = (error, results) => {
         if (error) {
             console.error("Error readPlantedPlot:", error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         }
 
         if (results.length === 0) {
@@ -137,7 +139,9 @@ module.exports.clearGardenPlot = (req, res, next) => {
     const callback = (error) => {
         if (error) {
             console.error("Error clearGardenPlot:", error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         }
 
         next();
@@ -158,7 +162,9 @@ module.exports.sellPlant = (req, res, next) => {
     const callback = (error) => {
         if (error) {
             console.error("Error sellPlant:", error);
-            return res.status(500).json(error);
+           return res.status(500).json({
+            message: "Internal server error"
+        });
         }
 
         return res.status(200).json({
@@ -178,7 +184,9 @@ module.exports.getGardenPlots = (req, res, next) => {
     const callback = (error, results) => {
         if (error) {
             console.error("Error getGardenPlots:", error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         }
          
         return res.status(200).json(results);

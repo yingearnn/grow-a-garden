@@ -4,7 +4,9 @@ module.exports.getAllTools = (req, res, next) => {
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error getAllTools:", error);
-            return res.status(500).json(error);
+           return res.status(500).json({
+            message: "Internal server error"
+        });
         }
         else {
             return res.status(200).json(results[1]);
@@ -22,7 +24,9 @@ module.exports.selectToolsById = (req, res, next) => {
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error selectToolsById:", error);
-            return res.status(500).json(error);
+             return res.status(500).json({
+            message: "Internal server error"
+        });
         }
         else {
             if (results.length == 0) {
@@ -61,7 +65,9 @@ module.exports.buyTools = (req, res, next) => {
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error buyTools:", error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         }
         else {
             return res.status(201).json({

@@ -6,7 +6,9 @@ module.exports.readAllPlants = (req, res, next) =>
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error readAllPlants:", error);
-            return res.status(500).json(error);
+           return res.status(500).json({
+            message: "Internal server error"
+        });
         } 
         else
             return res.status(200).json(results[1]);
@@ -25,7 +27,9 @@ module.exports.readPlantById = (req, res, next) =>
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error readPlantById:", error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         } else {
             if(results.length == 0) 
             {
@@ -91,7 +95,10 @@ module.exports.ownedPlantsById = (req, res, next) =>
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error readOwnedId:", error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
+        
         } else {
             if(results.length == 0) 
             {

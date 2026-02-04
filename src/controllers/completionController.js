@@ -17,7 +17,9 @@ module.exports.createNewRecord = (req, res, next) => {
 
     // Check cooldown: has user already completed this challenge recently?
     completionModel.getUserCompleteById({ id: completedChallenge.challenge_id }, (error, results) => {
-        if (error) return res.status(500).json(error);
+        if (error)  return res.status(500).json({
+            message: "Internal server error"
+        });
 
         const lastCompletion = results.find(r => r.user_id === existUser.user_id);
 
@@ -49,7 +51,9 @@ const bonusMultiplier = hasBonus ? 1.5 : 1;
         const callback = (error, results, fields) => {
             if (error) {
                 console.error("Error recordCompleted:", error);
-                return res.status(500).json(error);
+                return res.status(500).json({
+            message: "Internal server error"
+        });
             } else {
                 req.complete_id = results.insertId;
                 req.challenge_id = completedChallenge.challenge_id;
@@ -74,7 +78,9 @@ module.exports.getUserCompletionById = (req, res, next) =>
       const callback = (error, results, fields) => {
           if (error) {
               console.error("Error readUsersByChallengeId:", error);
-              return res.status(500).json(error);
+               return res.status(500).json({
+            message: "Internal server error"
+        });
           } else {
               if(results.length == 0) 
               {
@@ -102,7 +108,9 @@ module.exports.updateUserPoints = (req, res, next) => {
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error updatePoints:", error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         }
 
         if(results.affectedRows == 0) {

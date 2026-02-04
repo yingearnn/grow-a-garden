@@ -7,7 +7,9 @@ module.exports.readAllUser = (req, res, next) =>
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error readAllUser:", error);
-           return res.status(500).json(error);
+           return res.status(500).json({
+            message: "Internal server error"
+        });
         } 
         else return res.status(200).json(results);
     }
@@ -26,7 +28,9 @@ module.exports.readUserById = (req, res, next) =>
     const callback = (error, results, fields) => {
         if (error) {
             console.error("Error readUserById:", error);
-             return res.status(500).json(error);
+            return res.status(500).json({
+            message: "Internal server error"
+        });
         } else {
             if(results.length == 0) 
             {
@@ -73,7 +77,9 @@ module.exports.createNewUser = (req, res, next) => {
             }
 
             console.error("Error createNewUser:", error);
-            return res.status(500).json(error);
+             return res.status(500).json({
+            message: "Internal server error"
+        });
         }
 
         // 4. Initialize garden plots for new user
@@ -127,7 +133,9 @@ module.exports.updateUserById = (req, res, next) =>
                 });
             }
             console.error("Error updateUserById:", error);
-           return res.status(500).json(error);
+           return res.status(500).json({
+            message: "Internal server error"
+        });
         } else {
             if(results.affectedRows == 0) 
             {
@@ -195,7 +203,9 @@ module.exports.login = (req, res, next) => {
         const callback = (error, results) => {
             if(error){
                 console.error("Error login callback: ", error);
-                res.status(500).json(error);
+                return res.status(500).json({
+            message: "Internal server error"
+        });
             } else {
                 if(results.length == 0){
                    return res.status(404).json({message: "User not found"}); 
@@ -211,7 +221,9 @@ module.exports.login = (req, res, next) => {
 
     } catch (error) {
         console.error("Error login: ", error);
-        res.status(500).json(error);
+         return res.status(500).json({
+            message: "Internal server error"
+        });
     }
 };
 
