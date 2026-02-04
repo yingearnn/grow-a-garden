@@ -201,8 +201,24 @@ async function harvestAllPlants() {
             return;
         }
 
+        // Filter out plants that are still on cooldown (30 minutes)
+        const now = new Date();
+        const harvestablePlots = plantedPlots.filter(plot => {
+            const plantedTime = new Date(plot.planted_on);
+            const timeDiff = now - plantedTime;
+            const cooldownMs = 30 * 60 * 1000; // 30 minutes in milliseconds
+            return timeDiff >= cooldownMs;
+        });
+
+        if (harvestablePlots.length === 0) {
+            showNotification('No plants ready to harvest! All plants are still on cooldown.' , 'error');
+            return;
+        }
+
         let harvested = 0;
-        for (const plot of plantedPlots) {
+        let onCooldown = plantedPlots.length - harvestablePlots.length;
+        
+        for (const plot of harvestablePlots) {
             try {
                 const sellResponse = await fetch(`${currentUrl}/garden/sell`, {
                     method: 'POST',
@@ -224,7 +240,11 @@ async function harvestAllPlants() {
             }
         }
 
-        showNotification(`Harvested ${harvested} plants! Check your points and net worth.` , 'success');
+        let message = `Harvested ${harvested} plants!`;
+        if (onCooldown > 0) {
+            message += ` (${onCooldown} still on cooldown)`;
+        }
+        showNotification(message , 'success');
         
         // Reload user data and garden
         await loadUserData();
