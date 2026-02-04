@@ -107,7 +107,7 @@ function openPlantModal(userPlantId, plantName) {
     e.preventDefault();
 
     const raw = document.getElementById('plot-number').value;
-    const plotNumber = parseInt(raw, 10);
+    const plotNumber = Number(raw)
 
     // Keep only basic "is number" validation.
     if (Number.isNaN(plotNumber)) {
@@ -137,7 +137,7 @@ async function plantInGarden(userPlantId, plotNumber) {
       },
       body: JSON.stringify({
         user_plant_id: parseInt(userPlantId, 10),
-        plot_number: parseInt(plotNumber, 10)
+        plot_number: Number(plotNumber)
       })
     });
 

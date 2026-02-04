@@ -11,7 +11,7 @@ import { getToken, getUserId, checkAuth, logout } from './auth.js';
 const SHOP_STORAGE_KEY = 'shop_state';
 
 // Shop refresh interval for cache validity (1 minute)
-const SHOP_REFRESH_INTERVAL = 60000; // ms
+const SHOP_REFRESH_INTERVAL = 60000; // ms  //demo: 10000
 
 // Save featured shop items + timestamp into localStorage
 function saveShopState(plants, tools) {

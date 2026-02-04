@@ -46,7 +46,12 @@ module.exports.checkInventory = (req, res, next) => {
 module.exports.checkPlot = (req, res, next) => {
   const { user_id, plot_number } = req.plantData;
 
-  if (plot_number < 1 || plot_number > 20) {
+  // reject NaN + decimals
+  if (!Number.isInteger(plot_number)) {
+    return res.status(400).json({ message: "plot_number must be a whole number" });
+  }
+
+  if (plot_number < 1 || plot_number > 20 ) {
     return res.status(400).json({ message: "Invalid plot number" });
   }
 
