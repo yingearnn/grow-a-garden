@@ -31,15 +31,17 @@ module.exports.markAsPlanted = (data, callback) => {
 
 // Plant a plant into a plot
 module.exports.plantInPlot = (data, callback) => {
-    // Update the plot with user_plant_id and the correct value
+    // Update the plot with user_plant_id and the correct value AND update planted_on timestamp
     const SQL = `
         UPDATE GardenPlots
-        SET plant_id = ?, value = (
-            SELECT p.value
-            FROM Plants p
-            JOIN UserPlants up ON up.plant_id = p.plant_id
-            WHERE up.user_plant_id = ?
-        )
+        SET plant_id = ?, 
+            value = (
+                SELECT p.value
+                FROM Plants p
+                JOIN UserPlants up ON up.plant_id = p.plant_id
+                WHERE up.user_plant_id = ?
+            ),
+            planted_on = NOW()
         WHERE user_id = ? AND plot_number = ?;
     `;
     // Pass user_plant_id, not plant_id
