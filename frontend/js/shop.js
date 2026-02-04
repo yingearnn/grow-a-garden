@@ -389,7 +389,7 @@ async function buyPlant(plantId, cost) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${getToken()}`
             },
-            body: JSON.stringify({ user_id: parseInt(getUserId()) })
+          
         });
 
         // Handle expired/invalid session
@@ -424,9 +424,9 @@ async function buyTool(toolId) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getToken()}`,
-      },
-      // If backend is fixed to use token user_id, you don't need body user_id at all
-      body: JSON.stringify({ user_id: parseInt(getUserId()) }),
+      }
+     
+      
     });
 
     if (response.status === 401) {

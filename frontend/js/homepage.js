@@ -176,8 +176,7 @@ async function harvestPlant(plotNumber) {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        user_id: parseInt(userId),
-        plot_number: parseInt(plotNumber),
+        plot_number: parseInt(plotNumber)
       }),
     });
 
@@ -249,8 +248,8 @@ async function harvestAllPlants() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            user_id: parseInt(userId),
-            plot_number: plot.plot_number,
+           
+            plot_number: plot.plot_number
           }),
         });
 
