@@ -15,7 +15,11 @@ module.exports.createNewChallenge = (req, res, next) => {
   }
 
   const description = String(req.body.description).trim();
-  const points = parseInt(req.body.points, 10);
+  const points = Number(req.body.points);
+
+   if (!Number.isInteger(points)) {
+    return res.status(400).json({ message: "points must be a whole number" });
+  }
 
   // Validate values properly
   if (!description || Number.isNaN(points)) {
@@ -227,7 +231,11 @@ module.exports.updateChallengesById = (req, res, next) => {
   }
 
   const description = String(req.body.description).trim();
-  const points = parseInt(req.body.points, 10);
+ const points = Number(req.body.points);
+
+   if (!Number.isInteger(points)) {
+    return res.status(400).json({ message: "points must be a whole number" });
+  }
 
   // Validate values properly
   if (!description || Number.isNaN(points)) {
