@@ -45,6 +45,13 @@ document.addEventListener("DOMContentLoaded", function () {
       showNotification("All fields are required!" , 'error');
       return;
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailRegex.test(email)) {
+  showNotification("Please enter a valid email address!", "error");
+  return;
+}
     
 
     const data = {
