@@ -38,13 +38,8 @@ async function editChallenge(challengeId) {
   const token = getToken();
   const userId = getUserId();
   const description = document.getElementById("edit-description").value.trim();
-  const points = parseInt(document.getElementById("edit-points").value, 10);
+  const points = Number(document.getElementById("edit-points").value);
 
-  // Keep only basic required check
-  if (!description || Number.isNaN(points)) {
-    showNotification("Please fill in all fields", "error");
-    return;
-  }
 
   try {
     const response = await fetch(`${currentUrl}/challenges/${challengeId}`, {
@@ -373,24 +368,11 @@ async function createChallenge(event) {
   event.preventDefault();
 
   const token = getToken();
-  const userId = getUserId();
   const description = document.getElementById("challenge-description").value.trim();
-  const points = parseInt(document.getElementById("challenge-points").value, 10);
+  const points = Number(document.getElementById("challenge-points").value);
 
-  // Keep only basic required check
-  if (!description || Number.isNaN(points)) {
-    showNotification("Please fill in all fields", "error");
-    return;
-  }
+  
 
-  // NOTE: backend currently does NOT check "must have >=10 points to create"
-  // So keep this frontend check unless you add it to backend
-  const pointsText = document.getElementById("points-display").textContent;
-  const userCurPoints = parseInt(pointsText.replace("Points: ", ""), 10);
-  if (userCurPoints < 10) {
-    showNotification("Insufficient points to create new challenge", "error");
-    return;
-  }
 
   try {
     const response = await fetch(`${currentUrl}/challenges`, {

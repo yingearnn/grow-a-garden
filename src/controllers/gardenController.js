@@ -124,7 +124,7 @@ module.exports.readPlantedPlot = (req, res, next) => {
   const plot_number = req.body.plot_number;
 
   if (plot_number === undefined) {
-    return res.status(400).json({ message: "plot_number is required" });
+    return res.status(400).json({ message: "plot number is required" });
   }
 
   const data = {
@@ -158,7 +158,7 @@ module.exports.clearGardenPlot = (req, res, next) => {
   const lastTime = new Date(req.plant.planted_on);
   const now = new Date();
 
-  if (now - lastTime < 30 * 60 * 1000) {
+  if (now - lastTime < 1 * 60 * 1000) {
     return res.status(400).json({ message: "Plants can only be sold after 30 minutes" });
   }
 

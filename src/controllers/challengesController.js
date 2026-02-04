@@ -10,15 +10,19 @@ const challengesModel = require("../models/challengesModel.js");
 // =========================
 module.exports.createNewChallenge = (req, res, next) => {
   // Validate required fields
-  if (req.user.user_id === undefined || req.body.description === undefined || req.body.points === undefined) {
-    return res.status(400).json({ message: "Description or points is undefined" });
+  if ( req.body.description === undefined || req.body.points === undefined) {
+    return res.status(400).json({ message: "Please fill in all fields" });
   }
 
   const description = String(req.body.description).trim();
   const points = Number(req.body.points);
 
+  if(req.user.points < 10){
+     return res.status(400).json({ message: "Insufficient points to create new challenge" });
+  }
+
    if (!Number.isInteger(points)) {
-    return res.status(400).json({ message: "points must be a whole number" });
+    return res.status(400).json({ message: "Points must be a whole number" });
   }
 
   // Validate values properly
