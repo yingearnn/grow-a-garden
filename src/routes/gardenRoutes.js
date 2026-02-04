@@ -7,6 +7,7 @@ const gardenController = require('../controllers/gardenController');
 // Apply JWT verification to ALL garden routes
 router.use(jwtMiddleware.verifyToken);
 
+
 // Now all routes below are protected
 router.get('/:userId', gardenController.getGardenPlots);
 

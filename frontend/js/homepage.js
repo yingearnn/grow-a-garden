@@ -216,44 +216,31 @@ async function harvestAllPlants() {
   const userId = getUserId();
 
   try {
-    // Fetch all plots first (to know which ones are planted + cooldown)
     const response = await fetch(`${currentUrl}/garden/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!response.ok) throw new Error("No plants planted");
+    if (response.status === 401) {
+      showNotification("Session expired. Please login again.", "error");
+      logout();
+      return;
+    }
 
-    const plots = await response.json();
+    const plots = await response.json().catch(() => []);
 
-    // Filter only plots that have a plant
-    const plantedPlots = plots.filter((p) => p.plant_id !== null);
+    // Only plots that have a planted plant
+    const plantedPlots = (plots || []).filter((p) => p.plant_id !== null);
 
+    // (Optional UX) If you still want a fast message without spamming sell calls:
     if (plantedPlots.length === 0) {
-      showNotification("No plants to harvest!", "error");
+      showNotification("No plants planted.", "error");
       return;
     }
 
-    // Cooldown: 30 minutes (match backend rule)
-    const now = new Date();
-    const cooldownMs = 30 * 60 * 1000;
-
-    // Only harvest plants that have passed cooldown
-    const harvestablePlots = plantedPlots.filter((plot) => {
-      const plantedTime = new Date(plot.planted_on);
-      return now - plantedTime >= cooldownMs;
-    });
-
-    if (harvestablePlots.length === 0) {
-      showNotification("No plants ready to harvest! All plants are still on cooldown.", "error");
-      return;
-    }
-
-    // Track success count + cooldown count for message
     let harvested = 0;
-    const onCooldown = plantedPlots.length - harvestablePlots.length;
+    const errors = {}; // message -> count
 
-    // Harvest each plot one by one
-    for (const plot of harvestablePlots) {
+    for (const plot of plantedPlots) {
       try {
         const sellResponse = await fetch(`${currentUrl}/garden/sell`, {
           method: "POST",
@@ -267,27 +254,38 @@ async function harvestAllPlants() {
           }),
         });
 
-        // Count only successful harvests
-        if (sellResponse.ok) harvested++;
+        const data = await sellResponse.json().catch(() => ({}));
+
+        if (sellResponse.ok) {
+          harvested++;
+        } else {
+          const msg = data.message || "Failed to harvest";
+          errors[msg] = (errors[msg] || 0) + 1;
+        }
       } catch (err) {
-        console.error("Error harvesting plot:", plot.plot_number, err);
+        errors["Network error harvesting plant"] = (errors["Network error harvesting plant"] || 0) + 1;
       }
     }
 
-    // Show summary message
-    let message = `Harvested ${harvested} plants!`;
-    if (onCooldown > 0) message += ` (${onCooldown} still on cooldown)`;
+    // Prefer backend messages (cooldown, empty plots, etc.)
+    if (harvested === 0) {
+      const topMsg = Object.keys(errors)[0] || "No plants could be harvested.";
+      showNotification(topMsg, "error");
+    } else {
+      let msg = `Harvested ${harvested} plant(s)!`;
+      const cooldownMsg = "Plants can only be sold after 30 minutes";
+      if (errors[cooldownMsg]) msg += ` (${errors[cooldownMsg]} on cooldown)`;
+      showNotification(msg, "success");
+    }
 
-    showNotification(message, "success");
-
-    // Refresh UI after harvesting
     await loadUserData();
     await loadGardenPlots();
   } catch (error) {
     console.error("Error harvesting all plants:", error);
-    showNotification("Error harvesting all plants: " + error.message, "error");
+    showNotification("Error harvesting all plants", "error");
   }
 }
+
 
 // ---------------- Page Init ----------------
 document.addEventListener("DOMContentLoaded", async () => {

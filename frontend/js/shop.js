@@ -417,47 +417,45 @@ async function buyPlant(plantId, cost) {
 
 // ---------------- Buy Tool ----------------
 // Sends request to backend to buy tool and updates user points display
-async function buyTool(toolId, cost, multiplier) {
-    const user = await loadUserData();
+async function buyTool(toolId) {
+  try {
+    const response = await fetch(`${currentUrl}/tools/${toolId}/buy`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      // If backend is fixed to use token user_id, you don't need body user_id at all
+      body: JSON.stringify({ user_id: parseInt(getUserId()) }),
+    });
 
-    // Frontend check: ensure user has enough points before calling backend
-    if (!user || user.points < cost) {
-        showNotification('Insufficient points!', 'error');
-        return false;
+    if (response.status === 401) {
+      showNotification("Session expired. Please login again.", "error");
+      logout();
+      return false;
     }
 
-    try {
-        const response = await fetch(`${currentUrl}/tools/${toolId}/buy`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}`
-            },
-            body: JSON.stringify({ user_id: parseInt(getUserId()) })
-        });
+    const data = await response.json().catch(() => ({}));
 
-        // Handle expired/invalid session
-        if (response.status === 401) {
-            handleUnauthorized();
-            return false;
-        }
-
-        // Handle backend error response
-        if (!response.ok) {
-            const error = await response.json();
-            handleFetchError(error, error.message || 'Failed to purchase tool');
-            return false;
-        }
-
-        // Refresh user data to update points display
-        await loadUserData();
-        return true;
-
-    } catch (error) {
-        handleFetchError(error, 'Error purchasing tool');
-        return false;
+    if (!response.ok) {
+      // show backend message
+      showNotification(data.message || "Failed to purchase tool", "error");
+      return false;
     }
+
+    // show backend success message
+    showNotification(data.message || "Tool purchased!", "success");
+
+    // refresh user stats (points)
+    await loadUserData();
+    return true;
+  } catch (err) {
+    console.error("Error purchasing tool:", err);
+    showNotification("Error purchasing tool", "error");
+    return false;
+  }
 }
+
 
 // ---------------- Shop Refresh Timer ----------------
 // Updates countdown timer and refreshes shop every minute

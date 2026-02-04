@@ -40,13 +40,9 @@ async function editChallenge(challengeId) {
   const description = document.getElementById("edit-description").value.trim();
   const points = parseInt(document.getElementById("edit-points").value, 10);
 
-  if (!description || !points) {
+  // Keep only basic required check
+  if (!description || Number.isNaN(points)) {
     showNotification("Please fill in all fields", "error");
-    return;
-  }
-
-   if (points> 50 || points <=0) {
-    showNotification("Points must be between 1 and 50", "error");
     return;
   }
 
@@ -66,6 +62,7 @@ async function editChallenge(challengeId) {
 
     const data = await response.json().catch(() => ({}));
 
+    // Show backend message directly
     if (!response.ok) {
       showNotification(data.message || "Failed to update challenge", "error");
       return;
@@ -377,26 +374,21 @@ async function createChallenge(event) {
 
   const token = getToken();
   const userId = getUserId();
-
   const description = document.getElementById("challenge-description").value.trim();
   const points = parseInt(document.getElementById("challenge-points").value, 10);
 
-  // Get current points from UI (simple check)
-  const pointsText = document.getElementById("points-display").textContent;
-  const userCurPoints = parseInt(pointsText.replace("Points: ", ""), 10);
-
-  if (userCurPoints < 10) {
-    showNotification("Insufficient points to create new challenge", "error");
-    return;
-  }
-
-  if (!description || !points) {
+  // Keep only basic required check
+  if (!description || Number.isNaN(points)) {
     showNotification("Please fill in all fields", "error");
     return;
   }
 
-  if (points > 50) {
-    showNotification("Maximum 50 points allowed for a challenge", "error");
+  // NOTE: backend currently does NOT check "must have >=10 points to create"
+  // So keep this frontend check unless you add it to backend
+  const pointsText = document.getElementById("points-display").textContent;
+  const userCurPoints = parseInt(pointsText.replace("Points: ", ""), 10);
+  if (userCurPoints < 10) {
+    showNotification("Insufficient points to create new challenge", "error");
     return;
   }
 
@@ -408,9 +400,8 @@ async function createChallenge(event) {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        user_id: parseInt(userId),
         description,
-        points,
+        points
       }),
     });
 
@@ -421,6 +412,7 @@ async function createChallenge(event) {
 
     const data = await response.json().catch(() => ({}));
 
+    // Show backend message directly (cooldown/max points/etc.)
     if (!response.ok) {
       showNotification(data.message || "Failed to create challenge", "error");
       return;
@@ -428,7 +420,6 @@ async function createChallenge(event) {
 
     showNotification(`Challenge created: "${description}" (${points} points)`, "success");
 
-    // Refresh UI
     await loadUserData();
     document.getElementById("create-challenge-form").reset();
     switchTab("available");
@@ -438,6 +429,7 @@ async function createChallenge(event) {
     showNotification("Error creating challenge. Please try again.", "error");
   }
 }
+
 
 /**
  * Open completion modal for a challenge.
@@ -472,12 +464,9 @@ function closeModal() {
 async function completeChallenge(challengeId) {
   const token = getToken();
   const userId = getUserId();
-  const details = document.getElementById("completion-details").value.trim();
 
-  if (!details) {
-    showNotification("Please describe how you completed the challenge.", "error");
-    return;
-  }
+  // Do NOT block on frontend; let backend validate and return message
+  const details = document.getElementById("completion-details").value;
 
   try {
     const response = await fetch(`${currentUrl}/challenges/${challengeId}/complete`, {
@@ -487,8 +476,7 @@ async function completeChallenge(challengeId) {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        user_id: parseInt(userId),
-        details,
+        details // backend will trim + validate
       }),
     });
 
@@ -499,6 +487,7 @@ async function completeChallenge(challengeId) {
 
     const data = await response.json().catch(() => ({}));
 
+    // Show backend error message directly
     if (!response.ok) {
       showNotification(data.message || "Failed to complete challenge", "error");
       return;
@@ -508,7 +497,6 @@ async function completeChallenge(challengeId) {
 
     closeModal();
 
-    // Refresh stats + completed tab
     await loadUserData();
     await loadCompletedChallenges();
   } catch (error) {
@@ -516,6 +504,7 @@ async function completeChallenge(challengeId) {
     showNotification("Error completing challenge", "error");
   }
 }
+
 
 /**
  * Switch between tabs.

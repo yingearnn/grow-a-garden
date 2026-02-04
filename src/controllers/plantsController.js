@@ -88,7 +88,7 @@ module.exports.buyPlants = (req, res, next) =>
 
     // Prepare purchase transaction data
     const data = {
-        user_id: req.body.user_id,        // User buying the plant
+        user_id: req.user.user_id,        // User buying the plant
         plant_id: req.plant.plant_id,     // Plant being purchased
         points: req.plant.points          // Cost in points
     } 
@@ -105,9 +105,8 @@ module.exports.buyPlants = (req, res, next) =>
         else {
             // Successful purchase response
             return res.status(201).json({
-                message: "Plant acquired",
                 plant_id: req.plant.plant_id,
-                user_id: req.body.user_id
+                user_id: req.user.user_id
             })
         }
     }

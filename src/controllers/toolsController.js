@@ -76,50 +76,37 @@ module.exports.selectToolsById = (req, res, next) => {
 // Buy a tool
 // =========================
 module.exports.buyTools = (req, res, next) => {
+  // Always trust authenticated user, not req.body.user_id
+  const userId = req.user.user_id;
 
-    // Check if user has enough points to buy tool
-    if (req.tool.cost > req.user.points) {
-        return res.status(400).json({ message: "Insufficient points" });
+  // Stock check
+  if (req.tool.stock <= 0) {
+    return res.status(400).json({ message: "Tool out of stock" });
+  }
+
+  // Points check
+  if (req.tool.cost > req.user.points) {
+    return res.status(400).json({ message: "Insufficient points" });
+  }
+
+  const data = {
+    user_id: userId,
+    item_id: req.tool.item_id,
+    cost: req.tool.cost,
+    multiplier: req.tool.multiplier,
+  };
+
+  toolsModel.boughtTool(data, (error) => {
+    if (error) {
+      console.error("Error buyTools:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
 
-    // Check if tool still has stock remaining
-    if (req.tool.stock <= 0) {
-        return res.status(400).json({ message: "Tool out of stock" });
-    }
-
-    // Prepare data for purchase transaction
-    const data = {
-        user_id: req.body.user_id,      // User making the purchase
-        item_id: req.tool.item_id,      // Tool being bought
-        cost: req.tool.cost,            // Cost in points
-        multiplier: req.tool.multiplier // Effect applied to plants
-    };
-
-    // Callback after DB purchase logic completes
-    const callback = (error, results, fields) => {
-        if (error) {
-            // Log purchase error
-            console.error("Error buyTools:", error);
-
-            // Return server error response
-            return res.status(500).json({
-                message: "Internal server error"
-            });
-        }
-        else {
-            // Successful purchase response
-            return res.status(201).json({
-                message: "Tool purchased and applied to all planted plants",
-                item_id: req.tool.item_id,
-                user_id: req.body.user_id,
-                multiplier: req.tool.multiplier
-            });
-        }
-    };
-
-    // Execute DB logic to:
-    // - Deduct user points
-    // - Reduce tool stock
-    // - Apply multiplier effect
-    toolsModel.boughtTool(data, callback);
+    return res.status(201).json({
+      item_id: req.tool.item_id,
+      user_id: userId,
+      multiplier: req.tool.multiplier,
+    });
+  });
 };
+

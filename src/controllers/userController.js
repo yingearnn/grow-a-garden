@@ -71,67 +71,50 @@ module.exports.readUserById = (req, res, next) =>
 // Create a new user (registration)
 // =========================
 module.exports.createNewUser = (req, res, next) => {
+  const { username, email, password } = req.body || {};
 
-    // 1. Validate required inputs exist in request body
-    if (!req.body || !req.body.username || !req.body.password || !req.body.email) {
-        return res.status(400).json({
-            message: "Username,password or email is missing"
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: "Username, password or email is missing" });
+  }
+
+  // backend email format check (so frontend doesn’t need it)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Please enter a valid email address" });
+  }
+
+  const data = {
+    username,
+    email,
+    password: res.locals.hash
+  };
+
+  const callback = (error, results) => {
+    if (error) {
+      if (error.code === "ER_DUP_ENTRY") {
+        return res.status(409).json({
+          message: "Username or email is already taken"
         });
+      }
+
+      console.error("Error createNewUser:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
 
-    // 2. Prepare insert data
-    // NOTE: password is stored in res.locals.hash (assumes bcrypt hashing middleware ran before this)
-    const data = {
-        username: req.body.username,
-        email: req.body.email,
-        password: res.locals.hash
-    };
+    const userId = results.insertId;
 
-    // 3. Insert user into DB
-    const callback = (error, results) => {
-        if (error) {
+    gardenModel.initializePlotsForUser({ user_id: userId }, (plotError) => {
+      if (plotError) console.error("Error initializing plots:", plotError);
+    });
 
-            // If username/email is duplicated in DB (unique constraint)
-            if (error.code === "ER_DUP_ENTRY") {
-                return res.status(409).json({
-                    message: "Username or email is already taken"
-                });
-            }
+    res.locals.user_id = userId;
+    res.locals.message = "Registration successful";
+    next();
+  };
 
-            // Other DB/server errors
-            console.error("Error createNewUser:", error);
-            return res.status(500).json({
-                message: "Internal server error"
-            });
-        }
-
-        // 4. After successful insert, get newly created user ID
-        const userId = results.insertId;
-        const plotData = { user_id: userId };
-        
-        // Initialize default garden plots for the new user
-        // This is done async and does not block registration response
-        gardenModel.initializePlotsForUser(plotData, (plotError) => {
-            if (plotError) {
-                // Log error but still allow registration to succeed
-                console.error("Error initializing plots:", plotError);
-                // Continue anyway - plots can be created later
-            } else {
-                console.log(`Garden plots initialized for user ${userId}`);
-            }
-        });
-
-        // 5. Store values in res.locals for the NEXT middleware (usually JWT token creation)
-        res.locals.user_id = userId;
-        res.locals.message = "Registration successful";
-
-        // Continue to next middleware
-        next();
-    };
-
-    // Execute insert query
-    userModel.insertSingle(data, callback);
+  userModel.insertSingle(data, callback);
 };
+
 
 
 
@@ -199,7 +182,7 @@ module.exports.validateUser = (req, res, next) =>
 {
     // Read user id from res.locals (usually set by JWT middleware)
     const data = {
-        user_id: res.locals.userId // NOTE: Make sure this matches your JWT middleware output (userId vs user_id)
+        user_id: res.locals.userId // NOTE: Make sure this matches your JWT middleware output 
     }
 
     const callback = (error, results, fields) => {

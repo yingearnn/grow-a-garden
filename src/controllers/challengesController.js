@@ -9,62 +9,59 @@ const challengesModel = require("../models/challengesModel.js");
 // - Inserts challenge into DB
 // =========================
 module.exports.createNewChallenge = (req, res, next) => {
+  // Validate required fields
+  if (req.user.user_id === undefined || req.body.description === undefined || req.body.points === undefined) {
+    return res.status(400).json({ message: "Description or points is undefined" });
+  }
 
-    // Validate required fields
-    // NOTE: req.user_id is set by readLatestChallenge middleware
-    if (req.user_id == undefined || req.body.description == undefined || req.body.points == undefined) {
-        return res.status(400).json({ message: "Description or points is undefined" });
+  const description = String(req.body.description).trim();
+  const points = parseInt(req.body.points, 10);
+
+  // Validate values properly
+  if (!description || Number.isNaN(points)) {
+    return res.status(400).json({ message: "Description or points is invalid" });
+  }
+
+  // Enforce 1–50 range
+  if (points < 1 || points > 50) {
+    return res.status(400).json({ message: "Points must be between 1 and 50" });
+  }
+
+  // Cooldown check (12 hours)
+  if (req.latestChallengeTime !== undefined) {
+    const lastCreated = new Date(req.latestChallengeTime);
+    const now = new Date();
+
+    if (now - lastCreated < 12 * 60 * 60 * 1000) {
+      return res.status(400).json({
+        message: "You can only create a new challenge once every 12 hours"
+      });
+    }
+  }
+
+  const data = {
+    user_id: req.user.user_id,
+    description,
+    points
+  };
+
+  const callback = (error, results) => {
+    if (error) {
+      console.error("Error createNewChallenge:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
 
-    // Prepare data for DB insert
-    const data = {
-        user_id: req.user_id,           // Creator user id (from middleware)
-        description: req.body.description,
-        points: req.body.points
-    }
+    return res.status(201).json({
+      challenge_id: results[0].insertId,
+      description: data.description,
+      creator_id: data.user_id,
+      points: data.points
+    });
+  };
 
-    // Enforce maximum challenge points
-    if (data.points > 50) {
-        return res.status(403).json({
-            message: "Maximum 50 points for challenge"
-        });
-    }
+  challengesModel.insertChallenge(data, callback);
+};
 
-    // Cooldown check: allow creating a new challenge only every 12 hours
-    if (req.latestChallengeTime != undefined) {
-        const lastCreated = new Date(req.latestChallengeTime);
-        const now = new Date();
-
-        if (now - lastCreated < 12 * 60 * 60 * 1000) {
-            return res.status(400).json({
-                message: "You can only create a new challenge once every 12 hours"
-            });
-        }
-    }
-
-    // Callback after DB insert finishes
-    const callback = (error, results, fields) => {
-        if (error) {
-            console.error("Error createNewChallenge:", error);
-            return res.status(500).json({
-                message: "Internal server error"
-            });
-        }
-        else {
-            // Return newly created challenge info
-            // NOTE: results[0].insertId suggests stored procedure return format
-            return res.status(201).json({
-                challenge_id: results[0].insertId,
-                description: data.description,
-                creator_id: data.user_id,
-                points: data.points
-            });
-        }
-    }
-
-    // Insert challenge into database
-    challengesModel.insertChallenge(data, callback);
-}
 
 
 // =========================
@@ -227,51 +224,51 @@ module.exports.getChallengeById = (req, res, next) => {
 // - Validates request body
 // - Only creator can update challenge
 // =========================
-module.exports.updateChallengesById = (req, res, next) =>
-{
-    // Validate required fields in body
-    if (req.body.user_id == undefined || req.body.points == undefined || req.body.description == undefined) {
-        return res.status(400).json({
-            message: "User_id or description or points is undefined"
-        });
+module.exports.updateChallengesById = (req, res, next) => {
+  if (req.body.user_id === undefined || req.body.points === undefined || req.body.description === undefined) {
+    return res.status(400).json({ message: "User_id or description or points is undefined" });
+  }
+
+  const challenge = req.challenge;
+
+  // Authorization
+  if (challenge.creator_id != req.body.user_id) {
+    return res.status(403).json({ message: "You are not the creator of this challenge" });
+  }
+
+  const description = String(req.body.description).trim();
+  const points = parseInt(req.body.points, 10);
+
+  // Validate values properly
+  if (!description || Number.isNaN(points)) {
+    return res.status(400).json({ message: "Description or points is invalid" });
+  }
+
+  // Enforce 1–50 range
+  if (points < 1 || points > 50) {
+    return res.status(400).json({ message: "Points must be between 1 and 50" });
+  }
+
+  const data = {
+    challenge_id: challenge.challenge_id,
+    user_id: req.body.user_id,
+    description,
+    points
+  };
+
+  const callback = (error) => {
+    if (error) {
+      console.error("Error updateChallengeById:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
 
-    const challenge = req.challenge; // Set by getChallengeById middleware
+    return res.status(200).json({
+      challenge_id: challenge.challenge_id,
+      creator_id: data.user_id,
+      description: data.description,
+      points: data.points
+    });
+  };
 
-    // Authorization: only creator can update
-    if (challenge.creator_id != req.body.user_id) {
-        return res.status(403).json({
-            message: "You are not the creator of this challenge"
-        });
-    }
-
-    // Prepare update data
-    const data = {
-        challenge_id: challenge.challenge_id,
-        user_id: req.body.user_id,
-        description: req.body.description,
-        points: req.body.points
-    }
-
-    // Callback after update finishes
-    const callback = (error, results, fields) => {
-        if (error) {
-            console.error("Error updateChallengeById:", error);
-            return res.status(500).json({
-                message: "Internal server error"
-            });
-        }
-        else {
-            // Return updated challenge data
-            return res.status(200).json({
-                challenge_id: challenge.challenge_id,
-                creator_id: data.user_id,
-                description: data.description,
-                points: data.points
-            });
-        }
-    }
-
-    // Execute DB update
-    challengesModel.updateChallengesById(data, callback);
-}
+  challengesModel.updateChallengesById(data, callback);
+};

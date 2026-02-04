@@ -1,265 +1,215 @@
 // controllers/gardenController.js
-
-// Import garden-related database functions
 const gardenModel = require("../models/gardenModel.js");
 
 // =========================
-// Check that the plant exists in user's inventory
+// Check that the plant exists in user's inventory (and belongs to logged-in user)
 // =========================
 module.exports.checkInventory = (req, res, next) => {
+  const { user_plant_id, plot_number } = req.body;
+  const loggedInUserId = res.locals.userId;
 
-    // Extract values from request body
-    const { user_plant_id, plot_number } = req.body;
+  if (!user_plant_id) {
+    return res.status(400).json({ message: "user_plant_id is required" });
+  }
 
-    // Ensure plant ID is provided
-    if (!user_plant_id) {
-        return res.status(400).json({ message: "user_plant_id is required" });
+  const data = { user_plant_id };
+
+  gardenModel.checkInventory(data, (error, results) => {
+    if (error) {
+      console.error("Error checkInventory:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
 
-    // Prepare query data
-    const data = { user_plant_id };
+    if (results.length === 0) {
+      return res.status(400).json({ message: "Plant not found in inventory" });
+    }
 
-    // Callback after DB inventory check
-    const callback = (error, results) => {
-        if (error) return next(error);
+    // IMPORTANT: make sure this inventory plant belongs to the logged-in user
+    if (parseInt(results[0].user_id) !== parseInt(loggedInUserId)) {
+      return res.status(403).json({ message: "This plant does not belong to you" });
+    }
 
-        // If plant does not exist in inventory
-        if (results.length === 0) {
-            return res.status(400).json({ message: "Plant not found in inventory" });
-        }
-
-        // Attach plant information for next middleware
-        req.plantData = {
-            user_id: results[0].user_id,           // Owner of plant
-            plant_id: results[0].plant_id,         // Type of plant
-            user_plant_id: results[0].user_plant_id, // Inventory record ID
-            plot_number                           // Plot where plant will be placed
-        };
-
-        // Continue to next check
-        next();
+    req.plantData = {
+      user_id: results[0].user_id,
+      plant_id: results[0].plant_id,
+      user_plant_id: results[0].user_plant_id,
+      plot_number
     };
 
-    // Query DB to verify plant exists in inventory
-    gardenModel.checkInventory(data, callback);
+    next();
+  });
 };
 
-
 // =========================
-// Check that the plot is valid and empty
+// Check that the plot is valid and empty (for logged in user)
 // =========================
 module.exports.checkPlot = (req, res, next) => {
+  const { user_id, plot_number } = req.plantData;
 
-    // Get data prepared in previous middleware
-    const { user_id, plot_number } = req.plantData;
+  if (plot_number < 1 || plot_number > 20) {
+    return res.status(400).json({ message: "Invalid plot number" });
+  }
 
-    // Validate plot number range (1 to 20)
-    if (plot_number < 1 || plot_number > 20) {
-        return res.status(400).json({ message: "Invalid plot number" });
+  const data = { user_id, plot_number };
+
+  gardenModel.getPlot(data, (error, results) => {
+    if (error) {
+      console.error("Error getPlot:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
 
-    // Prepare DB query data
-    const data = { user_id, plot_number };
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Plot not found" });
+    }
 
-    // Callback after DB plot check
-    const callback = (error, results) => {
-        if (error) return next(error);
+    if (results[0].plant_id !== null) {
+      return res.status(400).json({ message: "Plot already occupied" });
+    }
 
-        // If plot does not exist
-        if (results.length === 0) {
-            return res.status(404).json({ message: "Plot not found" });
-        }
-
-        // If plot already has a plant
-        if (results[0].plant_id !== null) {
-            return res.status(400).json({ message: "Plot already occupied" });
-        }
-
-        // Plot is valid and empty → continue
-        next();
-    };
-
-    // Query DB for plot status
-    gardenModel.getPlot(data, callback);
+    next();
+  });
 };
-
-
-// =========================
-// Remove plant from inventory (mark as planted)
-// =========================
-module.exports.markAsPlanted = (req, res, next) => {
-
-    // Get planted inventory record ID
-    const data = { id: req.plantedPlant };
-
-    // Update inventory record in DB
-    gardenModel.markAsPlanted(data, (error, result) => {
-        if (error) return next(error);
-
-        // If no rows updated, planting failed
-        if (result.affectedRows === 0) {
-            return res.status(400).json({ message: "Failed to mark plant as planted" });
-        }
-
-        // Final response after successful planting
-        return res.status(200).json({
-            message: "Plant planted successfully 🌱",
-            plot_number: req.plotNumber
-        });
-    });
-};
-
 
 // =========================
 // Plant the plant into the selected plot
 // =========================
 module.exports.plantIntoPlot = (req, res, next) => {
+  const data = req.plantData;
 
-    // Get prepared planting data
-    const data = req.plantData;
+  gardenModel.plantInPlot(data, (error) => {
+    if (error) {
+      console.error("Error plantInPlot:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
 
-    // Insert plant into garden plot in DB
-    gardenModel.plantInPlot(data, (error) => {
-        if (error) return next(error);
-
-        // Pass information to next middleware
-        req.plantedPlant = data.user_plant_id;
-        req.plotNumber = data.plot_number;
-
-        // Continue to markAsPlanted
-        next();
-    });
+    req.plantedPlant = data.user_plant_id;
+    req.plotNumber = data.plot_number;
+    next();
+  });
 };
 
+// =========================
+// Remove plant from inventory (mark as planted)
+// =========================
+module.exports.markAsPlanted = (req, res) => {
+  const data = { id: req.plantedPlant };
+
+  gardenModel.markAsPlanted(data, (error, result) => {
+    if (error) {
+      console.error("Error markAsPlanted:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: "Failed to mark plant as planted" });
+    }
+
+    return res.status(200).json({
+      message: "Plant planted successfully 🌱",
+      plot_number: req.plotNumber
+    });
+  });
+};
 
 // =========================
-// Read a specific planted plot
+// Read a specific planted plot (SELL flow) - use logged-in userId
 // =========================
 module.exports.readPlantedPlot = (req, res, next) => {
+  const loggedInUserId = res.locals.userId;
+  const plot_number = req.body.plot_number;
 
-    // Prepare query data
-    const data = {
-        user_id: req.body.user_id,
-        plot_number: req.body.plot_number
-    };
+  if (plot_number === undefined) {
+    return res.status(400).json({ message: "plot_number is required" });
+  }
 
-    // Callback after DB query
-    const callback = (error, results) => {
-        if (error) {
-            console.error("Error readPlantedPlot:", error);
-            return res.status(500).json({
-                message: "Internal server error"
-            });
-        }
+  const data = {
+    user_id: loggedInUserId,
+    plot_number
+  };
 
-        // If no plant exists in plot
-        if (results.length === 0) {
-            return res.status(404).json({ message: "No plant found in this plot" });
-        }
+  gardenModel.getPlantedPlot(data, (error, results) => {
+    if (error) {
+      console.error("Error readPlantedPlot:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
 
-        // Attach plant info for next middleware (selling)
-        req.plant = results[0];
-        next();
-    };
+    if (results.length === 0) {
+      return res.status(404).json({ message: "No plant found in this plot" });
+    }
 
-    // Query DB for planted plot details
-    gardenModel.getPlantedPlot(data, callback);
+    req.plant = results[0];
+    req.plotNumber = plot_number;
+    next();
+  });
 };
-
 
 // =========================
 // Clear a garden plot (with cooldown check)
 // =========================
 module.exports.clearGardenPlot = (req, res, next) => {
+  const loggedInUserId = res.locals.userId;
+  const plot_number = req.plotNumber;
 
-    // Prepare clear plot data
-    const data = {
-        user_id: req.body.user_id,
-        plot_number: req.body.plot_number,
-        time: req.plant.planted_on   // Time when plant was planted
-    };
+  const lastTime = new Date(req.plant.planted_on);
+  const now = new Date();
 
-    // Convert stored planted time to Date object
-    const lastTime = new Date(data.time);
-    const now = new Date();
+  if (now - lastTime < 30 * 60 * 1000) {
+    return res.status(400).json({ message: "Plants can only be sold after 30 minutes" });
+  }
 
-    // Enforce 30-minute cooldown before selling
-    if (now - lastTime < 30 * 60 * 1000) {
-        return res.status(400).json({ message: "Plants can only be sold after 30 minutes" });
+  const data = {
+    user_id: loggedInUserId,
+    plot_number
+  };
+
+  gardenModel.clearPlot(data, (error) => {
+    if (error) {
+      console.error("Error clearGardenPlot:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
-
-    // Callback after clearing plot
-    const callback = (error) => {
-        if (error) {
-            console.error("Error clearGardenPlot:", error);
-            return res.status(500).json({
-                message: "Internal server error"
-            });
-        }
-
-        // Continue to sellPlant middleware
-        next();
-    };
-
-    // Remove plant from plot in DB
-    gardenModel.clearPlot(data, callback);
+    next();
+  });
 };
-
 
 // =========================
 // Sell a plant (add points to user)
 // =========================
-module.exports.sellPlant = (req, res, next) => {
+module.exports.sellPlant = (req, res) => {
+  const loggedInUserId = res.locals.userId;
 
-    // Prepare data to add sell value to user points
-    const data = {
-        user_id: req.body.user_id,
-        value: req.plant.value
-    };
+  const data = {
+    user_id: loggedInUserId,
+    value: req.plant.value
+  };
 
-    // Callback after updating user points
-    const callback = (error) => {
-        if (error) {
-            console.error("Error sellPlant:", error);
-            return res.status(500).json({
-                message: "Internal server error"
-            });
-        }
+  gardenModel.addSellValue(data, (error) => {
+    if (error) {
+      console.error("Error sellPlant:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
 
-        // Successful sale response
-        return res.status(200).json({
-            message: "Plant sold successfully",
-            plant_id: req.plant.plant_id,
-            plot_number: req.body.plot_number
-        });
-    };
-
-    // Update user points in DB
-    gardenModel.addSellValue(data, callback);
+    return res.status(200).json({
+      message: "Plant sold successfully",
+      plant_id: req.plant.plant_id,
+      plot_number: req.plotNumber
+    });
+  });
 };
 
-
 // =========================
-// Get all garden plots for a user
+// Get all garden plots for a user (recommend: ignore param and use logged-in userId)
 // =========================
-module.exports.getGardenPlots = (req, res, next) => {
+module.exports.getGardenPlots = (req, res) => {
+  // safer: always use logged in user id
+  const loggedInUserId = res.locals.userId;
 
-    // Extract user ID from route parameter
-    const data = { user_id: req.params.userId };
+  const data = { user_id: loggedInUserId };
 
-    // Callback after DB query
-    const callback = (error, results) => {
-        if (error) {
-            console.error("Error getGardenPlots:", error);
-            return res.status(500).json({
-                message: "Internal server error"
-            });
-        }
-         
-        // Return all plot information
-        return res.status(200).json(results);
-    };
-
-    // Query DB for all plots belonging to user
-    gardenModel.getAllPlots(data, callback);
+  gardenModel.getAllPlots(data, (error, results) => {
+    if (error) {
+      console.error("Error getGardenPlots:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    return res.status(200).json(results);
+  });
 };
