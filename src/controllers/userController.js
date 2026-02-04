@@ -106,7 +106,7 @@ module.exports.createNewUser = (req, res, next) => {
 
 
 
-// Update user info
+/* // Update user info
 module.exports.updateUserById = (req, res, next) =>
 {
     if(req.body.username == undefined)
@@ -154,13 +154,13 @@ module.exports.updateUserById = (req, res, next) =>
     }
 
     userModel.updateUserById(data, callback);
-}
+} */
 
 // Middleware: Validate user exists
 module.exports.validateUser = (req, res, next) =>
 {
     const data = {
-        user_id: req.body.user_id
+      user_id: res.locals.userId
     }
 
     const callback = (error, results, fields) => {

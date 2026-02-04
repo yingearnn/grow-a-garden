@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const jwtMiddleware = require('../middlewares/jwtMiddleware');
-
-const plantsController = require('../controllers/plantsController.js');
 const userController = require('../controllers/userController');
 const toolsController = require('../controllers/toolsController');
 router.use(jwtMiddleware.verifyToken);
