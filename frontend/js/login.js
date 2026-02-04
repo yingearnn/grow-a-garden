@@ -14,28 +14,27 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    try {
-      const res = await fetch(`${currentUrl}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
+   try {
+  const res = await fetch(`${currentUrl}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
 
-      const data = await res.json();
+  const data = await res.json();
 
-      if (res.status === 200 && data.token) {
-        // Correct credentials → login
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.userId);
-        window.location.href = "homepage.html";
-      } else {
-        // Wrong username or password
-        const msg = data?.message || "Wrong username or password";
-        showNotification(msg, "error");
-        document.getElementById("login-password").value = ""; // clear password
-      }
-    } catch (err) {
-      console.error("Login fetch error:", err);
-    }
+  if (res.status === 200 && data.token) {
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("userId", data.userId);
+    window.location.href = "homepage.html";
+  } else {
+    const msg = data?.message || "Wrong username or password";
+    showNotification(msg, "error");
+    document.getElementById("login-password").value = "";
+  }
+} catch (err) {
+  console.error("Login fetch error:", err);
+  showNotification("Unable to connect to server. Please try again later.", "error");
+}
   });
 });

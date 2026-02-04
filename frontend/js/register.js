@@ -45,6 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
       showNotification("All fields are required!" , 'error');
       return;
     }
+    
 
     const data = {
       username: username,
