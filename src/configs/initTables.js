@@ -12,6 +12,7 @@ bcrypt.hash("1234", saltRounds, (err, hash) => {
   const SQLSTATEMENT = `
 -- DROP tables in correct order to avoid FK issues
 DROP TABLE IF EXISTS UserCompletion;
+DROP TABLE IF EXISTS challenge_creation_log;
 DROP TABLE IF EXISTS UserTools;
 DROP TABLE IF EXISTS GardenPlots;
 DROP TABLE IF EXISTS UserPlants;
